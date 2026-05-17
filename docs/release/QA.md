@@ -1,0 +1,43 @@
+# FoxClean Release QA
+
+- [x] `script/verify_local.sh --launch --package`
+- [x] `swift test`
+- [x] `xcodegen generate`
+- [x] `xcodebuild -scheme FoxCleanApp -destination 'platform=macOS' build`
+- [x] `xcodebuild -scheme FoxCleanCore -destination 'platform=macOS' build`
+- [x] `xcodebuild -scheme FoxCleanCLI -destination 'platform=macOS' build`
+- [x] `swift run fox --version`
+- [x] `swift run fox status`
+- [x] `swift run fox completion zsh`
+- [x] `swift run fox completion bash`
+- [x] `swift run fox completion fish`
+- [x] `swift run fox open monitor --print-url`
+- [x] `swift run fox touchid status --json`
+- [x] `swift run fox scan apps --json`
+- [x] `swift run fox analyze Sources --json`
+- [x] `dist/FoxClean.app/Contents/Resources/fox --version`
+- [x] `script/check_app_responsive.sh FoxClean`
+- [x] `script/check_app_runtime_static.sh`
+- [x] `script/check_pages_site.sh`
+- [x] `script/check_release_docs.sh`
+- [x] Help -> Keyboard Shortcuts window exists and is statically verified
+- [ ] Full Disk Access onboarding opens System Settings
+- [ ] Clean actions default to dry-run
+- [ ] Confirmed clean moves files to Trash
+- [ ] Operation log contains JSONL entries
+- [ ] Rollback restores Trash entries by session
+- [x] `script/check_telemetry_free.sh`
+- [x] `script/package_release.sh`
+- [x] `test -L dist/release/Applications`
+- [x] `script/update_homebrew_cask_sha.sh`
+- [x] `lipo -archs dist/release/FoxClean.app/Contents/MacOS/FoxClean`
+- [x] `lipo -archs dist/release/FoxClean.app/Contents/Resources/fox`
+- [x] `lipo -archs dist/release/FoxClean.app/Contents/Frameworks/FoxCleanCore.framework/Versions/A/FoxCleanCore`
+- [x] `hdiutil verify dist/FoxClean-1.0.0.dmg`
+- [x] `shasum -a 256 -c dist/FoxClean-1.0.0.dmg.sha256`
+- [x] `script/release_preflight.sh` local distributable checks
+- [x] `script/completion_audit.sh`
+- [x] No telemetry endpoint or analytics SDK present
+- [ ] DMG signed, notarized, and stapled before public release
+- [ ] `script/release_preflight.sh --strict`
+- [ ] `script/completion_audit.sh --strict`

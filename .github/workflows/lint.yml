@@ -1,0 +1,14 @@
+name: Lint
+
+on:
+  push:
+  pull_request:
+
+jobs:
+  lint:
+    runs-on: macos-14
+    steps:
+      - uses: actions/checkout@v4
+      - run: brew bundle
+      - run: swiftlint lint --strict
+      - run: swift-format lint -r Sources FoxCleanApp Tests

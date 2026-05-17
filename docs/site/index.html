@@ -1,0 +1,438 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>FoxClean</title>
+    <meta name="description" content="FoxClean is a free, telemetry-free macOS cleaner with a native app and CLI.">
+    <style>
+      :root {
+        color-scheme: light dark;
+        --bg: #f7f5f1;
+        --ink: #141414;
+        --muted: #5b5b5b;
+        --line: #d9d3c8;
+        --panel: #ffffff;
+        --accent: #dd5b39;
+        --accent-dark: #91361f;
+        --green: #23715a;
+      }
+
+      @media (prefers-color-scheme: dark) {
+        :root {
+          --bg: #11120f;
+          --ink: #f5f1e9;
+          --muted: #b9b0a4;
+          --line: #38342e;
+          --panel: #1b1b18;
+          --accent: #ff7a52;
+          --accent-dark: #ffb199;
+          --green: #73c4a5;
+        }
+      }
+
+      * {
+        box-sizing: border-box;
+      }
+
+      body {
+        margin: 0;
+        font: 16px/1.5 -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+        background: var(--bg);
+        color: var(--ink);
+      }
+
+      a {
+        color: inherit;
+      }
+
+      .shell {
+        min-height: 100vh;
+        display: grid;
+        grid-template-rows: auto 1fr auto;
+      }
+
+      header,
+      main,
+      footer {
+        width: min(1120px, calc(100% - 32px));
+        margin: 0 auto;
+      }
+
+      header {
+        height: 72px;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 16px;
+      }
+
+      .brand {
+        display: inline-flex;
+        align-items: center;
+        gap: 12px;
+        text-decoration: none;
+        font-weight: 700;
+      }
+
+      .brand img {
+        width: 36px;
+        height: 36px;
+        border-radius: 8px;
+      }
+
+      nav {
+        display: flex;
+        gap: 18px;
+        color: var(--muted);
+        font-size: 14px;
+      }
+
+      .hero {
+        display: grid;
+        grid-template-columns: minmax(0, 0.95fr) minmax(360px, 1.05fr);
+        gap: 48px;
+        align-items: center;
+        min-height: calc(100vh - 148px);
+        padding: 20px 0 48px;
+      }
+
+      h1 {
+        margin: 0;
+        max-width: 760px;
+        font-size: clamp(48px, 9vw, 110px);
+        line-height: 0.94;
+        letter-spacing: 0;
+      }
+
+      .lead {
+        max-width: 640px;
+        margin: 26px 0 0;
+        color: var(--muted);
+        font-size: 20px;
+      }
+
+      .actions {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 12px;
+        margin-top: 32px;
+      }
+
+      .button {
+        min-height: 44px;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        padding: 0 18px;
+        border: 1px solid var(--line);
+        border-radius: 8px;
+        text-decoration: none;
+        font-weight: 700;
+      }
+
+      .button.primary {
+        border-color: var(--accent);
+        background: var(--accent);
+        color: white;
+      }
+
+      .terminal {
+        margin-top: 24px;
+        border: 1px solid var(--line);
+        border-radius: 8px;
+        background: var(--panel);
+        color: var(--muted);
+        padding: 14px 16px;
+        font: 14px/1.6 ui-monospace, SFMono-Regular, Menlo, monospace;
+        overflow-x: auto;
+      }
+
+      .product {
+        border: 1px solid var(--line);
+        border-radius: 8px;
+        overflow: hidden;
+        background: var(--panel);
+        box-shadow: 0 24px 60px rgb(0 0 0 / 12%);
+      }
+
+      .chrome {
+        height: 38px;
+        display: flex;
+        align-items: center;
+        gap: 7px;
+        padding: 0 14px;
+        border-bottom: 1px solid var(--line);
+      }
+
+      .dot {
+        width: 11px;
+        height: 11px;
+        border-radius: 50%;
+        background: var(--line);
+      }
+
+      .app-ui {
+        display: grid;
+        grid-template-columns: 148px 1fr;
+        min-height: 430px;
+      }
+
+      .side {
+        border-right: 1px solid var(--line);
+        padding: 18px 12px;
+        color: var(--muted);
+      }
+
+      .side div,
+      .metric {
+        border-radius: 8px;
+      }
+
+      .side div {
+        height: 34px;
+        display: flex;
+        align-items: center;
+        padding: 0 10px;
+        margin-bottom: 8px;
+      }
+
+      .side div:first-child {
+        background: color-mix(in srgb, var(--accent) 15%, transparent);
+        color: var(--accent-dark);
+        font-weight: 700;
+      }
+
+      .content {
+        padding: 26px;
+      }
+
+      .foxie {
+        display: flex;
+        align-items: center;
+        gap: 16px;
+        margin-bottom: 24px;
+      }
+
+      .foxie img {
+        width: 76px;
+        height: 76px;
+        border-radius: 18px;
+      }
+
+      .foxie strong {
+        display: block;
+        font-size: 28px;
+      }
+
+      .foxie span {
+        color: var(--muted);
+      }
+
+      .metrics {
+        display: grid;
+        grid-template-columns: repeat(3, 1fr);
+        gap: 12px;
+      }
+
+      .metric {
+        border: 1px solid var(--line);
+        padding: 14px;
+      }
+
+      .metric b {
+        display: block;
+        font-size: 24px;
+      }
+
+      .metric span {
+        color: var(--muted);
+        font-size: 13px;
+      }
+
+      .bar {
+        height: 10px;
+        margin-top: 12px;
+        border-radius: 999px;
+        background: var(--line);
+        overflow: hidden;
+      }
+
+      .bar i {
+        display: block;
+        height: 100%;
+        width: var(--value);
+        background: var(--green);
+      }
+
+      .features {
+        display: grid;
+        grid-template-columns: repeat(3, 1fr);
+        gap: 18px;
+        padding: 48px 0 72px;
+      }
+
+      .feature {
+        border-top: 1px solid var(--line);
+        padding-top: 18px;
+      }
+
+      .feature h2 {
+        margin: 0 0 8px;
+        font-size: 20px;
+      }
+
+      .feature p {
+        margin: 0;
+        color: var(--muted);
+      }
+
+      footer {
+        height: 76px;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 16px;
+        color: var(--muted);
+        border-top: 1px solid var(--line);
+      }
+
+      @media (max-width: 860px) {
+        nav {
+          display: none;
+        }
+
+        .hero {
+          grid-template-columns: 1fr;
+          gap: 28px;
+          min-height: auto;
+          padding-top: 20px;
+        }
+
+        h1 {
+          font-size: 56px;
+        }
+
+        .product {
+          order: -1;
+        }
+
+        .app-ui {
+          grid-template-columns: 1fr;
+          min-height: 0;
+        }
+
+        .side {
+          display: none;
+        }
+
+        .metrics,
+        .features {
+          grid-template-columns: 1fr;
+        }
+
+        footer {
+          height: auto;
+          padding: 20px 0;
+          align-items: flex-start;
+          flex-direction: column;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <div class="shell">
+      <header>
+        <a class="brand" href="index.html" aria-label="FoxClean home">
+          <img src="assets/icon_512.png" alt="">
+          <span>FoxClean</span>
+        </a>
+        <nav aria-label="Primary">
+          <a href="https://github.com/foxclean/foxclean">GitHub</a>
+          <a href="https://github.com/foxclean/foxclean/releases">Releases</a>
+          <a href="https://github.com/foxclean/foxclean/blob/main/README.md">Docs</a>
+        </nav>
+      </header>
+
+      <main>
+        <section class="hero" aria-labelledby="title">
+          <div>
+            <h1 id="title">FoxClean</h1>
+            <p class="lead">A free, telemetry-free macOS cleaner with a native SwiftUI app, shared safety engine, and the <code>fox</code> CLI.</p>
+            <div class="actions">
+              <a class="button primary" href="https://github.com/foxclean/foxclean/releases/latest">Download</a>
+              <a class="button" href="https://github.com/foxclean/foxclean">View Source</a>
+            </div>
+            <pre class="terminal">brew install --cask foxclean
+fox scan apps --json
+fox clean systemJunk</pre>
+          </div>
+
+          <div class="product" aria-label="FoxClean app preview">
+            <div class="chrome" aria-hidden="true">
+              <span class="dot"></span>
+              <span class="dot"></span>
+              <span class="dot"></span>
+            </div>
+            <div class="app-ui">
+              <div class="side" aria-hidden="true">
+                <div>Smart Scan</div>
+                <div>Apps</div>
+                <div>Orphans</div>
+                <div>Analyzer</div>
+                <div>Monitor</div>
+                <div>Toolkit</div>
+              </div>
+              <div class="content">
+                <div class="foxie">
+                  <img src="assets/icon_512.png" alt="">
+                  <div>
+                    <strong>Ready to scan</strong>
+                    <span>Dry-run first, Trash-first cleanup, JSONL operation logs.</span>
+                  </div>
+                </div>
+                <div class="metrics">
+                  <div class="metric">
+                    <b>0</b>
+                    <span>telemetry endpoints</span>
+                    <div class="bar"><i style="--value: 100%"></i></div>
+                  </div>
+                  <div class="metric">
+                    <b>7</b>
+                    <span>localized docs</span>
+                    <div class="bar"><i style="--value: 70%"></i></div>
+                  </div>
+                  <div class="metric">
+                    <b>2</b>
+                    <span>Mac architectures</span>
+                    <div class="bar"><i style="--value: 100%"></i></div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        <section class="features" aria-label="Highlights">
+          <article class="feature">
+            <h2>Native app and CLI</h2>
+            <p>SwiftUI views and the <code>fox</code> command share the same Swift core.</p>
+          </article>
+          <article class="feature">
+            <h2>Safety-first cleanup</h2>
+            <p>Dry-run reports, Trash-first actions, operation logs, rollback hooks, and symlink escape checks.</p>
+          </article>
+          <article class="feature">
+            <h2>No telemetry</h2>
+            <p>No analytics SDKs, tracking identifiers, outbound telemetry endpoints, or subscription gates.</p>
+          </article>
+        </section>
+      </main>
+
+      <footer>
+        <span>MIT licensed. Credits: PureMac and Mole.</span>
+        <span>macOS 13+, Apple Silicon and Intel.</span>
+      </footer>
+    </div>
+  </body>
+</html>

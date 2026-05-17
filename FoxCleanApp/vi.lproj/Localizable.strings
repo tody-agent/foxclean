@@ -1,0 +1,137 @@
+/* Full Disk Access Banner */
+"Full Disk Access Required" = "Can quyen Truy cap toan bo dia";
+"FoxClean needs Full Disk Access to scan Trash, Mail, Desktop, Documents, and Homebrew cache." = "FoxClean can quyen Truy cap toan bo dia de quet Thung rac, Mail, Desktop, Documents va bo nho dem Homebrew.";
+"Open Settings" = "Mo Cai dat";
+
+/* Top Bar */
+"Macintosh HD" = "Macintosh HD";
+"%@ free" = "Con trong %@";
+"Auto-clean: " = "Tu dong don dep: ";
+
+/* Sidebar */
+"CLEANING" = "DON DEP";
+"Last cleaned: %@" = "Lan don gan nhat: %@";
+"Home" = "Trang chu";
+"Applications" = "Ung dung";
+"Cleaning" = "Don dep";
+"Installed Apps" = "Ung dung da cai";
+"Orphaned Files" = "Tep con sot lai";
+"Select a category from the sidebar to get started." = "Chon mot danh muc tu thanh ben de bat dau.";
+
+/* Smart Scan */
+"Smart Scan" = "Quet thong minh";
+"Click Scan to start" = "Bam Quet de bat dau";
+"Total" = "Tong";
+"Used" = "Da dung";
+"Free" = "Con trong";
+"Purgeable" = "Co the giai phong";
+"junk found" = "tep rac duoc tim thay";
+"Your Mac is clean!" = "May Mac cua ban da sach!";
+"freed up" = "da giai phong";
+"Cleaning..." = "Dang don dep...";
+"Scanning..." = "Dang quet...";
+"%lld/%lld items" = "%lld/%lld muc";
+
+/* Category Detail */
+"All Clean!" = "Tat ca da sach!";
+"No junk files found in this category." = "Khong tim thay tep rac trong danh muc nay.";
+"Not scanned yet" = "Chua quet";
+"Click Scan to analyze this category" = "Bam Quet de phan tich danh muc nay";
+"%lld of %lld selected" = "Da chon %lld/%lld";
+"Select All" = "Chon tat ca";
+"Deselect All" = "Bo chon tat ca";
+"%lld items" = "%lld muc";
+
+/* Buttons */
+"Scan" = "Quet";
+"Re-scan" = "Quet lai";
+"Scan Again" = "Quet lan nua";
+"Done" = "Xong";
+"Clean (%@)" = "Don dep (%@)";
+"Clean %lld items (%@)" = "Don dep %lld muc (%@)";
+
+/* Settings - Schedule */
+"Schedule" = "Lich trinh";
+"Automatic Cleaning" = "Don dep tu dong";
+"Automatically scan and clean your Mac on a schedule" = "Tu dong quet va don dep may Mac theo lich";
+"Scan Interval" = "Tan suat quet";
+"Automation" = "Tu dong hoa";
+"Auto-clean after scan" = "Tu dong don sau khi quet";
+"Minimum junk size to trigger clean:" = "Dung luong rac toi thieu de kich hoat don dep:";
+"50 MB" = "50 MB";
+"100 MB" = "100 MB";
+"250 MB" = "250 MB";
+"500 MB" = "500 MB";
+"1 GB" = "1 GB";
+"Auto-purge purgeable space" = "Tu dong giai phong dung luong co the xoa";
+"Show notification on completion" = "Hien thong bao khi hoan tat";
+"Status" = "Trang thai";
+"Last run" = "Lan chay gan nhat";
+"Next run" = "Lan chay tiep theo";
+"Never" = "Chua bao gio";
+"Not scheduled" = "Chua len lich";
+
+/* Settings - General */
+"General" = "Chung";
+"App Behavior" = "Hanh vi ung dung";
+"Launch at login" = "Mo khi dang nhap";
+"Show in Dock" = "Hien trong Dock";
+"Show menu bar icon" = "Hien bieu tuong tren thanh menu";
+"Safety" = "An toan";
+"FoxClean will never delete system-critical files. Only caches, logs, temporary files, and user-selected items are removed." = "FoxClean se khong xoa tep quan trong cua he thong. Chi cache, log, tep tam va cac muc nguoi dung chon moi duoc xoa.";
+
+/* Settings - About */
+"About" = "Gioi thieu";
+"Version 1.0.0" = "Phien ban 1.0.0";
+"A free, open-source Mac cleaning utility.\nKeep your Mac fast, clean, and optimized." = "Tien ich don dep Mac mien phi, ma nguon mo.\nGiu may Mac nhanh, sach va toi uu.";
+"GitHub Repository" = "Kho ma nguon GitHub";
+"MIT License" = "Giay phep MIT";
+
+/* Cleaning Categories */
+"System Junk" = "Rac he thong";
+"User Cache" = "Cache nguoi dung";
+"AI Apps" = "Ung dung AI";
+"Mail Files" = "Tep Mail";
+"Trash Bins" = "Thung rac";
+"Large & Old Files" = "Tep lon va cu";
+"Purgeable Space" = "Dung luong co the giai phong";
+"Xcode Junk" = "Rac Xcode";
+"Brew Cache" = "Cache Brew";
+
+/* Category Descriptions */
+"Scan everything at once" = "Quet tat ca cung luc";
+"System caches, logs, and temporary files" = "Cache he thong, log va tep tam";
+"Application caches and browser data" = "Cache ung dung va du lieu trinh duyet";
+"Logs, caches, and temporary files from local AI apps" = "Log, cache va tep tam tu ung dung AI tren may";
+"Local AI app logs, caches, and optional history" = "Log, cache va lich su tuy chon cua ung dung AI tren may";
+"Downloaded mail attachments" = "Tep dinh kem mail da tai";
+"Files in your Trash" = "Tep trong Thung rac";
+"Files over 100 MB or older than 1 year" = "Tep tren 100 MB hoac cu hon 1 nam";
+"APFS purgeable disk space" = "Dung luong APFS co the giai phong";
+"Derived data, archives, and simulators" = "Derived data, archives va simulator";
+"Homebrew download cache" = "Cache tai xuong Homebrew";
+
+/* Schedule Intervals */
+"Every Hour" = "Moi gio";
+"Every 3 Hours" = "Moi 3 gio";
+"Every 6 Hours" = "Moi 6 gio";
+"Every 12 Hours" = "Moi 12 gio";
+"Daily" = "Hang ngay";
+"Weekly" = "Hang tuan";
+"Every 2 Weeks" = "Moi 2 tuan";
+"Monthly" = "Hang thang";
+
+/* Notifications */
+"Found %@ of junk files." = "Tim thay %@ tep rac.";
+
+/* Node Cache */
+"Node Cache" = "Cache Node";
+"npm, yarn, and pnpm download caches" = "Cache tai xuong npm, yarn va pnpm";
+"npm cache" = "cache npm";
+"yarn classic cache" = "cache yarn classic";
+"pnpm content-addressable store" = "kho content-addressable cua pnpm";
+
+/* Docker Cache */
+"Docker Cache" = "Cache Docker";
+"Docker images, containers, and build cache" = "Image, container va cache build cua Docker";
+"Reclaimable (run `docker system prune -af`)" = "Co the thu hoi (chay `docker system prune -af`)";

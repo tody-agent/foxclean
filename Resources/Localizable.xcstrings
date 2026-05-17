@@ -1,0 +1,28 @@
+{
+  "sourceLanguage" : "vi",
+  "strings" : {
+    "FoxClean" : {
+      "localizations" : {
+        "ar" : { "stringUnit" : { "state" : "translated", "value" : "FoxClean" } },
+        "en" : { "stringUnit" : { "state" : "translated", "value" : "FoxClean" } },
+        "es" : { "stringUnit" : { "state" : "translated", "value" : "FoxClean" } },
+        "ja" : { "stringUnit" : { "state" : "translated", "value" : "FoxClean" } },
+        "zh-Hans" : { "stringUnit" : { "state" : "translated", "value" : "FoxClean" } },
+        "zh-Hant" : { "stringUnit" : { "state" : "translated", "value" : "FoxClean" } },
+        "vi" : { "stringUnit" : { "state" : "translated", "value" : "FoxClean" } }
+      }
+    },
+    "Smart Scan" : {
+      "localizations" : {
+        "ar" : { "stringUnit" : { "state" : "translated", "value" : "الفحص الذكي" } },
+        "en" : { "stringUnit" : { "state" : "translated", "value" : "Smart Scan" } },
+        "es" : { "stringUnit" : { "state" : "translated", "value" : "Análisis inteligente" } },
+        "ja" : { "stringUnit" : { "state" : "translated", "value" : "スマートスキャン" } },
+        "zh-Hans" : { "stringUnit" : { "state" : "translated", "value" : "智能扫描" } },
+        "zh-Hant" : { "stringUnit" : { "state" : "translated", "value" : "智慧掃描" } },
+        "vi" : { "stringUnit" : { "state" : "translated", "value" : "Quet thong minh" } }
+      }
+    }
+  },
+  "version" : "1.0"
+}

@@ -1,0 +1,9 @@
+{
+  "source": "Mole/lib/clean/hints.sh",
+  "hints": [
+    { "key": "xcode-derived-data", "title": "Xcode DerivedData", "paths": ["~/Library/Developer/Xcode/DerivedData"], "category": "xcodeJunk" },
+    { "key": "homebrew-cache", "title": "Homebrew Cache", "paths": ["~/Library/Caches/Homebrew", "/opt/homebrew/Library/Caches"], "category": "developerCache" },
+    { "key": "npm-cache", "title": "npm Cache", "paths": ["~/.npm"], "category": "developerCache" },
+    { "key": "trash", "title": "User Trash", "paths": ["~/.Trash"], "category": "trash" }
+  ]
+}

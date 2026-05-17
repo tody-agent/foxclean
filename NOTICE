@@ -1,0 +1,6 @@
+FoxClean includes design and implementation work derived from:
+
+- PureMac, MIT License, by momenbasel. Used as the native macOS GUI, scan, clean, onboarding, settings, and localization foundation.
+- Mole, MIT License, by tw93. Used as the source for protection patterns, cleanup hints, CLI concepts, purge, installer, status, and optimization workflows.
+
+FoxClean is telemetry-free by default and does not include analytics SDKs.

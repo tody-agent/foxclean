@@ -1,0 +1,9 @@
+{
+  "conditions": [
+    {
+      "bundleID": "com.apple.dt.Xcode",
+      "includeTerms": ["xcode", "developer"],
+      "excludeTerms": ["simulator devices"]
+    }
+  ]
+}

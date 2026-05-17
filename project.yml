@@ -1,0 +1,75 @@
+name: FoxClean
+options:
+  bundleIdPrefix: dev.foxclean
+  deploymentTarget:
+    macOS: "13.0"
+  xcodeVersion: "16.4"
+  createIntermediateGroups: true
+
+settings:
+  base:
+    SWIFT_VERSION: "5.9"
+    MACOSX_DEPLOYMENT_TARGET: "13.0"
+    ARCHS: "arm64 x86_64"
+    ONLY_ACTIVE_ARCH: "NO"
+    CODE_SIGN_STYLE: "Automatic"
+    PRODUCT_BUNDLE_IDENTIFIER: "dev.foxclean.app"
+    MARKETING_VERSION: "1.0.0"
+    CURRENT_PROJECT_VERSION: "1"
+    GENERATE_INFOPLIST_FILE: "NO"
+    ASSETCATALOG_COMPILER_APPICON_NAME: "AppIcon"
+
+targets:
+  FoxCleanApp:
+    type: application
+    platform: macOS
+    sources:
+      - FoxCleanApp
+    dependencies:
+      - target: FoxCleanCore
+        embed: true
+      - target: FoxCleanCLI
+        embed: false
+    postBuildScripts:
+      - name: Embed fox CLI
+        basedOnDependencyAnalysis: false
+        script: |
+          set -euo pipefail
+          RESOURCES_DIR="$TARGET_BUILD_DIR/$UNLOCALIZED_RESOURCES_FOLDER_PATH"
+          FRAMEWORKS_DIR="$TARGET_BUILD_DIR/$FRAMEWORKS_FOLDER_PATH"
+          mkdir -p "$RESOURCES_DIR"
+          mkdir -p "$FRAMEWORKS_DIR"
+          cp "$BUILT_PRODUCTS_DIR/fox" "$RESOURCES_DIR/fox"
+          chmod +x "$RESOURCES_DIR/fox"
+          rm -rf "$FRAMEWORKS_DIR/FoxCleanCore.framework"
+          cp -R "$BUILT_PRODUCTS_DIR/FoxCleanCore.framework" "$FRAMEWORKS_DIR/FoxCleanCore.framework"
+    settings:
+      base:
+        PRODUCT_NAME: FoxClean
+        INFOPLIST_FILE: "FoxCleanApp/Info.plist"
+        CODE_SIGN_ENTITLEMENTS: "FoxCleanApp/FoxClean.entitlements"
+        SWIFT_EMIT_LOC_STRINGS: "YES"
+      configs:
+        Debug:
+          CODE_SIGNING_ALLOWED: "NO"
+          CODE_SIGNING_REQUIRED: "NO"
+  FoxCleanCore:
+    type: framework
+    platform: macOS
+    sources:
+      - Sources/FoxCleanCore
+    settings:
+      base:
+        PRODUCT_BUNDLE_IDENTIFIER: "dev.foxclean.core"
+        GENERATE_INFOPLIST_FILE: "YES"
+  FoxCleanCLI:
+    type: tool
+    platform: macOS
+    sources:
+      - Sources/FoxCleanCLI
+    dependencies:
+      - target: FoxCleanCore
+    settings:
+      base:
+        PRODUCT_NAME: fox
+        OTHER_SWIFT_FLAGS: "$(inherited) -parse-as-library"

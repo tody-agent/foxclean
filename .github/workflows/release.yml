@@ -1,0 +1,36 @@
+name: Release
+
+on:
+  push:
+    tags:
+      - "v*"
+
+jobs:
+  package:
+    runs-on: macos-14
+    steps:
+      - uses: actions/checkout@v4
+      - run: brew bundle
+      - run: ./script/check_telemetry_free.sh
+      - run: ./script/package_release.sh
+        env:
+          DEVELOPER_ID_APPLICATION: ${{ secrets.DEVELOPER_ID_APPLICATION }}
+          APPLE_ID: ${{ secrets.APPLE_ID }}
+          APPLE_TEAM_ID: ${{ secrets.APPLE_TEAM_ID }}
+          APPLE_APP_SPECIFIC_PASSWORD: ${{ secrets.APPLE_APP_SPECIFIC_PASSWORD }}
+          APPLE_API_KEY_PATH: ${{ secrets.APPLE_API_KEY_PATH }}
+          APPLE_API_KEY_ID: ${{ secrets.APPLE_API_KEY_ID }}
+          APPLE_API_ISSUER_ID: ${{ secrets.APPLE_API_ISSUER_ID }}
+      - uses: softprops/action-gh-release@v2
+        with:
+          files: |
+            dist/FoxClean-*.dmg
+            dist/FoxClean-*.dmg.sha256
+            homebrew/foxclean.rb
+      - uses: actions/upload-artifact@v4
+        with:
+          name: FoxClean-DMG
+          path: |
+            dist/FoxClean-*.dmg
+            dist/FoxClean-*.dmg.sha256
+            homebrew/foxclean.rb

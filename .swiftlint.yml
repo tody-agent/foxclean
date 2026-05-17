@@ -1,0 +1,13 @@
+disabled_rules:
+  - trailing_comma
+  - todo
+line_length:
+  warning: 160
+  error: 220
+identifier_name:
+  min_length: 2
+excluded:
+  - PureMac
+  - Mole
+  - .build
+  - FoxCleanApp/Assets.xcassets

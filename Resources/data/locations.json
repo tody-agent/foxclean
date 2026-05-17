@@ -1,0 +1,16 @@
+{
+  "appSearch": [
+    "~/Library/Application Support",
+    "~/Library/Caches",
+    "~/Library/Containers",
+    "~/Library/Group Containers",
+    "~/Library/Logs",
+    "~/Library/Preferences",
+    "~/Library/Saved Application State",
+    "~/Library/WebKit",
+    "/Library/Application Support",
+    "/Library/Caches",
+    "/Library/Logs",
+    "/Library/Preferences"
+  ]
+}

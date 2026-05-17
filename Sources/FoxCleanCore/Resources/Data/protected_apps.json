@@ -1,0 +1,19 @@
+{
+  "source": "Mole/lib/core/app_protection.sh",
+  "patterns": [
+    "com.apple.finder",
+    "com.apple.dock",
+    "com.apple.systempreferences",
+    "com.apple.SystemSettings",
+    "com.apple.loginwindow",
+    "com.apple.security*",
+    "com.apple.keychain*",
+    "com.apple.SoftwareUpdate*",
+    "com.apple.installer*",
+    "loginwindow",
+    "finder",
+    "dock",
+    "tcc",
+    "org.cups.*"
+  ]
+}
