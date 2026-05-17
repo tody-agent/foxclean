@@ -97,6 +97,9 @@ final class FoxCleanCoreTests: XCTestCase {
         XCTAssertLessThanOrEqual(snapshot.topProcesses.count, 5)
         XCTAssertGreaterThanOrEqual(snapshot.cpuLoad, 0)
         XCTAssertLessThanOrEqual(snapshot.cpuLoad, 1)
+        XCTAssertGreaterThanOrEqual(snapshot.diskReadBytesPerSecond, 0)
+        XCTAssertGreaterThanOrEqual(snapshot.diskWrittenBytesPerSecond, 0)
+        XCTAssertFalse(snapshot.thermalState.isEmpty)
     }
 
     func testTreemapPreservesArea() {

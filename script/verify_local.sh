@@ -83,6 +83,24 @@ run_json_smoke() {
   fi
 }
 
+run_json_has_keys() {
+  local name="$1"
+  local output_file="$2"
+  shift 2
+  echo "+ check JSON keys in ${output_file#$ROOT_DIR/}: $*"
+  if ruby -rjson -e '
+    file = ARGV.shift
+    object = JSON.parse(File.read(file))
+    missing = ARGV.reject { |key| object.key?(key) }
+    abort("missing keys: #{missing.join(", ")}") unless missing.empty?
+  ' "$output_file" "$@"; then
+    echo "pass: $name"
+  else
+    echo "fail: $name"
+    exit 1
+  fi
+}
+
 run_contains() {
   local name="$1"
   local expected="$2"
@@ -128,7 +146,11 @@ run_log "xcodebuild-app" xcodebuild -scheme FoxCleanApp -destination "platform=m
 step "CLI smoke checks"
 run_log "fox-version" swift run fox --version
 run_contains "fox-no-args-noninteractive" "Usage: fox <command>" swift run fox
-run_log "fox-status" swift run fox status
+run_json_smoke "fox-status" swift run fox status
+run_json_has_keys "fox-status-fields" "$ARTIFACT_DIR/fox-status.json" \
+  diskReadBytesPerSecond \
+  diskWrittenBytesPerSecond \
+  thermalState
 run_log "fox-completion-zsh" swift run fox completion zsh
 run_log "fox-completion-bash" swift run fox completion bash
 run_log "fox-completion-fish" swift run fox completion fish

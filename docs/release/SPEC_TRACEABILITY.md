@@ -32,7 +32,7 @@ Status legend:
 | Keyboard shortcuts | `FoxCleanApp.swift` command menus provide navigation shortcuts, Smart Scan shortcut, Full Disk Access shortcut, and a Help -> Keyboard Shortcuts window. App build/launch verifier passes. | Pass |
 | Clean/uninstall/orphans UI | PureMac-derived app views and services exist; no current UI automation coverage. | Partial |
 | Disk analyzer | `DiskScanner`, mtime-based persistent JSON scan cache in Application Support, squarified `TreemapLayout`, Analyzer Tree/Treemap modes, breadcrumb zoom, Finder reveal, guarded Move to Trash with `OperationLog`, and `fox analyze`; tests cover cache persistence behavior and treemap area/rows. SQLite specifically is not used to keep offline builds dependency-free. | Partial |
-| System monitor | `SystemMonitor`, `MonitorView`, menu bar metrics, and `fox status` now use host CPU ticks, VM memory stats, network counters, process count, top processes via libproc, battery percent via IOKit Power Sources, disk free, and health score. Disk I/O and temperature sampling remain limited. | Partial |
+| System monitor | `SystemMonitor`, `MonitorView`, menu bar metrics, and `fox status` now use host CPU ticks, VM memory stats, network counters, disk I/O throughput via IOKit storage statistics, process count, top processes via libproc, battery percent via IOKit Power Sources, disk free, public macOS thermal state, and health score. | Pass |
 | Menu bar widget | `MenuBarController` uses AppKit `NSStatusItem` with a SwiftUI `NSPopover`, mini CPU chart, health/memory metrics, Smart Scan/Open/Monitor/Quit actions, and a Settings toggle. `app-responsive` passes after launch. | Pass |
 | App responsiveness | `script/check_app_responsive.sh` verifies the launched app stays below the CPU threshold after startup; `script/check_app_runtime_static.sh` guards against reintroducing SwiftUI `MenuBarExtra` and missing local sidebar selection state. | Pass |
 | Project purge | Toolkit project marker scanning in core/GUI/CLI; unit tests cover marker safety and `~/.config/foxclean/purge_paths` custom roots; CLI JSON smoke covers `fox purge --paths Sources`. | Pass |
@@ -79,7 +79,8 @@ Verified:
 - `xcodebuild -scheme FoxCleanCLI -destination 'platform=macOS' build`
 - `xcodebuild -scheme FoxCleanApp -destination 'platform=macOS' build`
 - `swift run fox --version`
-- `swift run fox status`
+- `swift run fox status`, including JSON field checks for
+  `diskReadBytesPerSecond`, `diskWrittenBytesPerSecond`, and `thermalState`
 - `swift run fox completion zsh`
 - `swift run fox completion bash`
 - `swift run fox completion fish`

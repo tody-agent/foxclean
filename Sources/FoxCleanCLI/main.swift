@@ -157,7 +157,9 @@ struct FoxCLI {
         let monitor = SystemMonitor()
         if args.contains("--watch") {
             for await snapshot in await monitor.stream() {
-                print("Health \(snapshot.healthScore) CPU \(percent(snapshot.cpuLoad)) MEM \(percent(snapshot.memoryUsedRatio))")
+                let read = ByteCountFormatter.string(fromByteCount: Int64(snapshot.diskReadBytesPerSecond), countStyle: .file)
+                let written = ByteCountFormatter.string(fromByteCount: Int64(snapshot.diskWrittenBytesPerSecond), countStyle: .file)
+                print("Health \(snapshot.healthScore) CPU \(percent(snapshot.cpuLoad)) MEM \(percent(snapshot.memoryUsedRatio)) DISK \(read)/s read \(written)/s write THERMAL \(snapshot.thermalState)")
             }
         } else {
             printJSON(await monitor.snapshot())

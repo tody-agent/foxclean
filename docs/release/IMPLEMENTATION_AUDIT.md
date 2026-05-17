@@ -105,7 +105,7 @@ GitHub CI and Pages:
 | Scan core | `ScanEngine`, `PathFinder`, `RuleDatabase`, safe app/path metadata, 20 app/path fixtures, deep team/entitlement matching tests, and JSON CLI smoke checks. |
 | Cleaning core | `FileOperator`, `OperationLog`, `RollbackEngine`, dry-run first semantics, symlink escape rejection, and trash-based operations. |
 | Disk analyzer | `DiskScanner` with mtime-based persistent JSON cache in Application Support, squarified `TreemapLayout`, CLI `fox analyze`, and `AnalyzerView` Tree/Treemap modes with breadcrumb zoom, Finder reveal, and guarded Move to Trash logging. |
-| System monitor | `SystemMonitor` and `MonitorView` for uptime, host CPU ticks, VM memory stats, network throughput, battery percent, disk, process count, top processes, and health metrics. |
+| System monitor | `SystemMonitor` and `MonitorView` for uptime, host CPU ticks, VM memory stats, network throughput, disk I/O throughput via IOKit storage statistics, thermal state, battery percent, disk, process count, top processes, and health metrics. |
 | Toolkit features | Installer cleanup, project purge, and optimize flows in core/CLI/SwiftUI views; project purge reads `~/.config/foxclean/purge_paths`; installer scanning includes source labels for Homebrew, Mail, iCloud, downloads, shared folders, and app caches; optimizer tasks include command previews, admin flags, and selected-task dry-runs. |
 | GUI shell | SwiftUI sidebar sections, dashboard, onboarding, settings, toolkit views, mascot component, and AppKit menu bar status item. |
 | Keyboard commands | App command menus route to dashboard/apps/orphans/toolkit sections, run Smart Scan, open Full Disk Access settings, and show the Help -> Keyboard Shortcuts window. |
@@ -160,9 +160,10 @@ require credentials, account ownership, network publishing, or manual OS consent
 - Optimization tasks provide dry-run reports, command previews, and safe
   non-admin execution paths; privileged or destructive system changes still
   require explicit user authorization.
-- The monitor gathers host CPU ticks, VM memory, network, process count, top
-  processes, battery, disk, and health metrics; disk I/O and temperature
-  sampling remain limited.
+- The monitor gathers host CPU ticks, VM memory, network, disk I/O throughput,
+  process count, top processes, battery, disk, thermal state, and health
+  metrics. It uses public macOS thermal state instead of private temperature
+  sensor APIs.
 - UI snapshot and full VoiceOver/tab-order/contrast automation are not yet part
   of the local gate.
 - Full runtime UI string extraction is still broader than the static

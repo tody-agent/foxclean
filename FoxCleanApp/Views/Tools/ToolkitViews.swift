@@ -308,10 +308,12 @@ struct MonitorView: View {
                 metric("Uptime", value: uptime, icon: "clock.fill", tint: Tint.blue)
                 metric("Memory", value: memory, icon: "memorychip.fill", tint: Tint.purple)
                 metric("Disk Free", value: diskFree, icon: "internaldrive.fill", tint: Tint.green)
+                metric("Disk I/O", value: diskIO, icon: "externaldrive.connected.to.line.below.fill", tint: Tint.blue)
                 metric("CPU", value: cpu, icon: "cpu.fill", tint: Tint.orange)
                 metric("Network", value: network, icon: "arrow.up.arrow.down", tint: Tint.cyan)
                 metric("Processes", value: processCount, icon: "list.bullet.rectangle", tint: Tint.pink)
                 metric("Battery", value: battery, icon: "battery.100percent", tint: Tint.yellow)
+                metric("Thermal", value: thermalState, icon: "thermometer.medium", tint: Tint.orange)
                 metric("Health", value: healthScore, icon: "heart.fill", tint: Tint.red)
             }
 
@@ -361,6 +363,13 @@ struct MonitorView: View {
         return ByteCountFormatter.string(fromByteCount: snapshot.diskFreeBytes, countStyle: .file)
     }
 
+    private var diskIO: String {
+        guard let snapshot else { return "--" }
+        let read = ByteCountFormatter.string(fromByteCount: Int64(snapshot.diskReadBytesPerSecond), countStyle: .file)
+        let written = ByteCountFormatter.string(fromByteCount: Int64(snapshot.diskWrittenBytesPerSecond), countStyle: .file)
+        return "\(read)/s read, \(written)/s write"
+    }
+
     private var cpu: String {
         guard let snapshot else { return "--%" }
         return "\(Int((snapshot.cpuLoad * 100).rounded()))%"
@@ -381,6 +390,11 @@ struct MonitorView: View {
     private var battery: String {
         guard let value = snapshot?.batteryPercent else { return "N/A" }
         return "\(Int((value * 100).rounded()))%"
+    }
+
+    private var thermalState: String {
+        guard let snapshot else { return "--" }
+        return snapshot.thermalState.capitalized
     }
 
     private var healthScore: String {

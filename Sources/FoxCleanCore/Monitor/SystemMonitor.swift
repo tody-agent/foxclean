@@ -1,5 +1,6 @@
 import Darwin
 import Foundation
+import IOKit
 import IOKit.ps
 
 public struct ProcessSnapshot: Codable, Hashable, Identifiable, Sendable {
@@ -19,16 +20,21 @@ public struct SystemSnapshot: Codable, Sendable {
     public let memoryTotalBytes: UInt64
     public let diskFreeBytes: Int64
     public let diskTotalBytes: Int64
+    public let diskReadBytesPerSecond: Double
+    public let diskWrittenBytesPerSecond: Double
     public let networkReceivedBytesPerSecond: Double
     public let networkSentBytesPerSecond: Double
     public let processCount: Int
     public let topProcesses: [ProcessSnapshot]
     public let batteryPercent: Double?
+    public let thermalState: String
     public let healthScore: Int
 }
 
 public actor SystemMonitor {
     private var previousCPU: CPUCounters?
+    private var previousDiskIO: DiskIOCounters?
+    private var previousDiskIODate: Date?
     private var previousNetwork: NetworkCounters?
     private var previousNetworkDate: Date?
 
@@ -39,14 +45,20 @@ public actor SystemMonitor {
         let cpu = cpuLoad()
         let memory = memoryInfo()
         let disk = diskInfo()
+        let diskIO = diskIOCounters()
+        let diskIOInterval = previousDiskIODate.map { max(0.001, now.timeIntervalSince($0)) } ?? 1
+        let previousDiskIO = previousDiskIO
+        self.previousDiskIO = diskIO
+        previousDiskIODate = now
         let network = networkCounters()
         let interval = previousNetworkDate.map { max(0.001, now.timeIntervalSince($0)) } ?? 1
         let previousNetwork = previousNetwork
         self.previousNetwork = network
         previousNetworkDate = now
         let battery = batteryPercent()
+        let thermalState = ProcessInfo.processInfo.thermalState
         let processes = topProcesses(limit: 5)
-        let score = HealthScore.calculate(cpuLoad: cpu, memoryUsedRatio: memory.ratio, freeRatio: disk.total > 0 ? Double(disk.free) / Double(disk.total) : 0.0, batteryPercent: battery)
+        let score = HealthScore.calculate(cpuLoad: cpu, memoryUsedRatio: memory.ratio, freeRatio: disk.total > 0 ? Double(disk.free) / Double(disk.total) : 0.0, batteryPercent: battery, thermalState: thermalState)
         return SystemSnapshot(
             timestamp: now,
             cpuLoad: cpu,
@@ -55,11 +67,14 @@ public actor SystemMonitor {
             memoryTotalBytes: memory.total,
             diskFreeBytes: disk.free,
             diskTotalBytes: disk.total,
+            diskReadBytesPerSecond: previousDiskIO.map { Double(diskIO.readBytes.saturatingSubtract($0.readBytes)) / diskIOInterval } ?? 0,
+            diskWrittenBytesPerSecond: previousDiskIO.map { Double(diskIO.writtenBytes.saturatingSubtract($0.writtenBytes)) / diskIOInterval } ?? 0,
             networkReceivedBytesPerSecond: previousNetwork.map { Double(network.receivedBytes.saturatingSubtract($0.receivedBytes)) / interval } ?? 0,
             networkSentBytesPerSecond: previousNetwork.map { Double(network.sentBytes.saturatingSubtract($0.sentBytes)) / interval } ?? 0,
             processCount: processCount(),
             topProcesses: processes,
             batteryPercent: battery,
+            thermalState: thermalState.label,
             healthScore: score
         )
     }
@@ -79,6 +94,36 @@ public actor SystemMonitor {
     private func diskInfo() -> (free: Int64, total: Int64) {
         let attrs = try? FileManager.default.attributesOfFileSystem(forPath: "/")
         return (attrs?[.systemFreeSize] as? Int64 ?? 0, attrs?[.systemSize] as? Int64 ?? 0)
+    }
+
+    private func diskIOCounters() -> DiskIOCounters {
+        guard let matching = IOServiceMatching("IOBlockStorageDriver") else {
+            return DiskIOCounters(readBytes: 0, writtenBytes: 0)
+        }
+
+        var iterator: io_iterator_t = 0
+        guard IOServiceGetMatchingServices(kIOMainPortDefault, matching, &iterator) == KERN_SUCCESS else {
+            return DiskIOCounters(readBytes: 0, writtenBytes: 0)
+        }
+        defer { IOObjectRelease(iterator) }
+
+        var readBytes: UInt64 = 0
+        var writtenBytes: UInt64 = 0
+
+        while true {
+            let service = IOIteratorNext(iterator)
+            if service == 0 { break }
+            defer { IOObjectRelease(service) }
+
+            guard let stats = IORegistryEntryCreateCFProperty(service, "Statistics" as CFString, kCFAllocatorDefault, 0)?
+                .takeRetainedValue() as? [String: Any]
+            else { continue }
+
+            readBytes += uint64Value(stats["Bytes (Read)"])
+            writtenBytes += uint64Value(stats["Bytes (Write)"])
+        }
+
+        return DiskIOCounters(readBytes: readBytes, writtenBytes: writtenBytes)
     }
 
     private func cpuLoad() -> Double {
@@ -211,6 +256,14 @@ public actor SystemMonitor {
         }
         return nil
     }
+
+    private func uint64Value(_ value: Any?) -> UInt64 {
+        if let value = value as? UInt64 { return value }
+        if let value = value as? Int64 { return value > 0 ? UInt64(value) : 0 }
+        if let value = value as? Int { return value > 0 ? UInt64(value) : 0 }
+        if let value = value as? NSNumber { return value.uint64Value }
+        return 0
+    }
 }
 
 private struct CPUCounters: Sendable {
@@ -241,6 +294,11 @@ private struct NetworkCounters: Sendable {
     let sentBytes: UInt64
 }
 
+private struct DiskIOCounters: Sendable {
+    let readBytes: UInt64
+    let writtenBytes: UInt64
+}
+
 private extension UInt64 {
     func saturatingSubtract(_ other: UInt64) -> UInt64 {
         self >= other ? self - other : 0
@@ -248,12 +306,41 @@ private extension UInt64 {
 }
 
 public enum HealthScore {
-    public static func calculate(cpuLoad: Double, memoryUsedRatio: Double, freeRatio: Double, batteryPercent: Double?) -> Int {
+    public static func calculate(cpuLoad: Double, memoryUsedRatio: Double, freeRatio: Double, batteryPercent: Double?, thermalState: ProcessInfo.ThermalState = .nominal) -> Int {
         var score = 100.0
         score -= min(35, cpuLoad * 35)
         score -= min(30, memoryUsedRatio * 30)
         score -= freeRatio < 0.1 ? 25 : (freeRatio < 0.2 ? 10 : 0)
         if let batteryPercent, batteryPercent < 0.15 { score -= 10 }
+        switch thermalState {
+        case .nominal:
+            break
+        case .fair:
+            score -= 5
+        case .serious:
+            score -= 15
+        case .critical:
+            score -= 25
+        @unknown default:
+            score -= 5
+        }
         return max(0, min(100, Int(score.rounded())))
+    }
+}
+
+private extension ProcessInfo.ThermalState {
+    var label: String {
+        switch self {
+        case .nominal:
+            return "nominal"
+        case .fair:
+            return "fair"
+        case .serious:
+            return "serious"
+        case .critical:
+            return "critical"
+        @unknown default:
+            return "unknown"
+        }
     }
 }
