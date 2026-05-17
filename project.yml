@@ -62,6 +62,7 @@ targets:
       base:
         PRODUCT_BUNDLE_IDENTIFIER: "dev.foxclean.core"
         GENERATE_INFOPLIST_FILE: "YES"
+        OTHER_LDFLAGS: "$(inherited) -lsqlite3"
   FoxCleanCLI:
     type: tool
     platform: macOS

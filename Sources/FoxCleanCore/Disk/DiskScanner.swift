@@ -1,4 +1,5 @@
 import Foundation
+import SQLite3
 
 public struct DiskNode: Codable, Hashable, Identifiable, Sendable {
     public var id: String { url.path }
@@ -165,42 +166,79 @@ private struct TreemapBounds {
 }
 
 private actor DiskScanCache {
-    private struct Entry: Codable {
-        let modifiedAt: Date?
-        let node: DiskNode
-    }
-
-    private var entries: [String: Entry] = [:]
-    private let cacheURL: URL
+    private let databaseURL: URL
+    private var database: OpaquePointer?
 
     init() {
         let appSupport = FileManager.default.urls(for: .applicationSupportDirectory, in: .userDomainMask).first
             ?? FileManager.default.temporaryDirectory
         let directory = appSupport.appendingPathComponent("FoxClean", isDirectory: true)
         try? FileManager.default.createDirectory(at: directory, withIntermediateDirectories: true)
-        cacheURL = directory.appendingPathComponent("disk_scan_cache.json")
-        if let data = try? Data(contentsOf: cacheURL),
-           let decoded = try? JSONDecoder().decode([String: Entry].self, from: data) {
-            entries = decoded
-        }
+        databaseURL = directory.appendingPathComponent("disk_scan_cache.sqlite")
+        database = Self.openDatabase(at: databaseURL)
+        Self.migrate(database)
+    }
+
+    deinit {
+        sqlite3_close(database)
     }
 
     func cachedNode(for url: URL, maxDepth: Int) -> DiskNode? {
+        guard let database else { return nil }
         let key = cacheKey(for: url, maxDepth: maxDepth)
-        guard let entry = entries[key],
-              entry.modifiedAt == modifiedAt(url)
-        else { return nil }
-        return entry.node
+        let query = "SELECT modified_at, node_json FROM entries WHERE cache_key = ? LIMIT 1"
+        var statement: OpaquePointer?
+        guard sqlite3_prepare_v2(database, query, -1, &statement, nil) == SQLITE_OK else { return nil }
+        defer { sqlite3_finalize(statement) }
+
+        sqlite3_bind_text(statement, 1, key, -1, transientDestructor)
+        guard sqlite3_step(statement) == SQLITE_ROW else { return nil }
+
+        let cachedModifiedAt: Date?
+        if sqlite3_column_type(statement, 0) == SQLITE_NULL {
+            cachedModifiedAt = nil
+        } else {
+            cachedModifiedAt = Date(timeIntervalSince1970: sqlite3_column_double(statement, 0))
+        }
+        guard datesMatch(cachedModifiedAt, modifiedAt(url)) else { return nil }
+
+        guard let blob = sqlite3_column_blob(statement, 1) else { return nil }
+        let byteCount = Int(sqlite3_column_bytes(statement, 1))
+        let data = Data(bytes: blob, count: byteCount)
+        return try? JSONDecoder().decode(DiskNode.self, from: data)
     }
 
     func store(_ node: DiskNode, for url: URL, maxDepth: Int) {
-        entries[cacheKey(for: url, maxDepth: maxDepth)] = Entry(modifiedAt: modifiedAt(url), node: node)
-        persist()
+        guard let database,
+              let data = try? JSONEncoder().encode(node)
+        else { return }
+
+        let query = """
+        INSERT OR REPLACE INTO entries(cache_key, path, max_depth, modified_at, node_json)
+        VALUES (?, ?, ?, ?, ?)
+        """
+        var statement: OpaquePointer?
+        guard sqlite3_prepare_v2(database, query, -1, &statement, nil) == SQLITE_OK else { return }
+        defer { sqlite3_finalize(statement) }
+
+        let key = cacheKey(for: url, maxDepth: maxDepth)
+        sqlite3_bind_text(statement, 1, key, -1, transientDestructor)
+        sqlite3_bind_text(statement, 2, url.path, -1, transientDestructor)
+        sqlite3_bind_int(statement, 3, Int32(maxDepth))
+        if let modifiedAt = modifiedAt(url) {
+            sqlite3_bind_double(statement, 4, modifiedAt.timeIntervalSince1970)
+        } else {
+            sqlite3_bind_null(statement, 4)
+        }
+        _ = data.withUnsafeBytes { bytes in
+            sqlite3_bind_blob(statement, 5, bytes.baseAddress, Int32(data.count), transientDestructor)
+        }
+        sqlite3_step(statement)
     }
 
     func clear() {
-        entries.removeAll()
-        try? FileManager.default.removeItem(at: cacheURL)
+        guard let database else { return }
+        sqlite3_exec(database, "DELETE FROM entries", nil, nil, nil)
     }
 
     private func cacheKey(for url: URL, maxDepth: Int) -> String {
@@ -211,8 +249,39 @@ private actor DiskScanCache {
         (try? url.resourceValues(forKeys: [.contentModificationDateKey]))?.contentModificationDate
     }
 
-    private func persist() {
-        guard let data = try? JSONEncoder().encode(entries) else { return }
-        try? data.write(to: cacheURL, options: .atomic)
+    private static func openDatabase(at url: URL) -> OpaquePointer? {
+        var opened: OpaquePointer?
+        guard sqlite3_open(url.path, &opened) == SQLITE_OK else {
+            sqlite3_close(opened)
+            return nil
+        }
+        sqlite3_exec(opened, "PRAGMA journal_mode=WAL", nil, nil, nil)
+        return opened
+    }
+
+    private static func migrate(_ database: OpaquePointer?) {
+        let query = """
+        CREATE TABLE IF NOT EXISTS entries(
+          cache_key TEXT PRIMARY KEY NOT NULL,
+          path TEXT NOT NULL,
+          max_depth INTEGER NOT NULL,
+          modified_at REAL,
+          node_json BLOB NOT NULL
+        )
+        """
+        sqlite3_exec(database, query, nil, nil, nil)
+    }
+
+    private func datesMatch(_ lhs: Date?, _ rhs: Date?) -> Bool {
+        switch (lhs, rhs) {
+        case (.none, .none):
+            return true
+        case let (.some(lhs), .some(rhs)):
+            return abs(lhs.timeIntervalSince1970 - rhs.timeIntervalSince1970) < 0.001
+        default:
+            return false
+        }
     }
 }
+
+private let transientDestructor = unsafeBitCast(-1, to: sqlite3_destructor_type.self)

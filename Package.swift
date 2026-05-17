@@ -14,6 +14,9 @@ let package = Package(
             name: "FoxCleanCore",
             resources: [
                 .process("Resources")
+            ],
+            linkerSettings: [
+                .linkedLibrary("sqlite3")
             ]
         ),
         .executableTarget(

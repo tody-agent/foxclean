@@ -139,7 +139,7 @@ final class FoxCleanCoreTests: XCTestCase {
         let cache = FileManager.default
             .urls(for: .applicationSupportDirectory, in: .userDomainMask)
             .first?
-            .appendingPathComponent("FoxClean/disk_scan_cache.json")
+            .appendingPathComponent("FoxClean/disk_scan_cache.sqlite")
         XCTAssertTrue(cache.map { FileManager.default.fileExists(atPath: $0.path) } ?? false)
     }
 
