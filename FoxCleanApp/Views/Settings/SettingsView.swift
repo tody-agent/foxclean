@@ -6,6 +6,8 @@ struct SettingsView: View {
         TabView {
             GeneralSettingsView()
                 .tabItem { Label("General", systemImage: "gear") }
+            PrivacySettingsView()
+                .tabItem { Label("Privacy", systemImage: "lock.shield") }
             CleaningSettingsView()
                 .tabItem { Label("Cleaning", systemImage: "trash") }
             ScheduleSettingsView()
@@ -13,7 +15,7 @@ struct SettingsView: View {
             AboutSettingsView()
                 .tabItem { Label("About", systemImage: "info.circle") }
         }
-        .frame(width: 480, height: 360)
+        .frame(width: 540, height: 420)
     }
 }
 
@@ -36,6 +38,7 @@ enum SearchSensitivity: String, CaseIterable, Identifiable, Codable {
 }
 
 struct GeneralSettingsView: View {
+    @EnvironmentObject var theme: ThemeManager
     @AppStorage("settings.general.launchAtLogin") private var launchAtLogin = false
     @AppStorage("settings.general.showMenuBar") private var showMenuBar = true
     @AppStorage("settings.general.searchSensitivity") private var sensitivity: SearchSensitivity = .enhanced
@@ -44,6 +47,33 @@ struct GeneralSettingsView: View {
 
     var body: some View {
         Form {
+            Section("Appearance") {
+                HStack {
+                    Text("Theme")
+                    Spacer()
+                    AppearancePill(selection: Binding(
+                        get: { theme.appearance },
+                        set: { theme.appearance = $0 }
+                    ))
+                }
+
+                Picker("Accent color", selection: Binding(
+                    get: { theme.accent },
+                    set: { theme.accent = $0 }
+                )) {
+                    ForEach(AccentChoice.allCases) { accent in
+                        Label {
+                            Text(accent.label)
+                        } icon: {
+                            Circle()
+                                .fill(accent.color)
+                                .frame(width: 10, height: 10)
+                        }
+                        .tag(accent)
+                    }
+                }
+            }
+
             Section("Startup") {
                 Toggle("Launch FoxClean at login", isOn: $launchAtLogin)
                     .onChange(of: launchAtLogin) { newValue in
@@ -92,6 +122,56 @@ struct GeneralSettingsView: View {
             Logger.shared.log("Failed to \(enabled ? "enable" : "disable") launch at login: \(error.localizedDescription)", level: .error)
             // Revert the toggle if operation failed
             launchAtLogin = !enabled
+        }
+    }
+}
+
+// MARK: - Privacy
+
+struct PrivacySettingsView: View {
+    @EnvironmentObject var appState: AppState
+
+    var body: some View {
+        Form {
+            Section("Full Disk Access") {
+                HStack {
+                    Label(
+                        appState.hasFullDiskAccess ? "Full Disk Access granted" : "Full Disk Access required",
+                        systemImage: appState.hasFullDiskAccess ? "checkmark.shield.fill" : "lock.shield"
+                    )
+                    .foregroundStyle(appState.hasFullDiskAccess ? Tint.green : Tint.orange)
+                    Spacer()
+                    Button("Refresh") {
+                        appState.checkFullDiskAccess()
+                    }
+                }
+
+                Button {
+                    FullDiskAccessManager.shared.openFullDiskAccessSettings()
+                } label: {
+                    Label("Open Full Disk Access Settings", systemImage: "gear")
+                }
+
+                Button {
+                    FullDiskAccessManager.shared.revealAppInFinder()
+                } label: {
+                    Label("Reveal FoxClean in Finder", systemImage: "finder")
+                }
+
+                Button("Reset permissions and re-prompt") {
+                    _ = FullDiskAccessManager.shared.resetFullDiskAccess()
+                    FullDiskAccessManager.shared.triggerRegistration()
+                    appState.checkFullDiskAccess()
+                }
+
+                Text("Full Disk Access is required for protected caches, uninstall leftovers, and complete scan results.")
+                    .font(.caption)
+                    .foregroundStyle(.secondary)
+            }
+        }
+        .formStyle(.grouped)
+        .onAppear {
+            appState.checkFullDiskAccess()
         }
     }
 }
@@ -183,6 +263,8 @@ struct AboutSettingsView: View {
 
             Section {
                 Text("MIT License")
+                    .foregroundStyle(.secondary)
+                Text("Credits: PureMac by momenbasel and Mole by tw93.")
                     .foregroundStyle(.secondary)
             }
         }

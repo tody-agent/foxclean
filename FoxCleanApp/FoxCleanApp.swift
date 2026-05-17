@@ -22,6 +22,10 @@ struct FoxCleanApp: App {
     @StateObject private var theme = ThemeManager.shared
     @AppStorage("FoxClean.OnboardingComplete") private var onboardingComplete = false
 
+    private var shouldSkipOnboarding: Bool {
+        ProcessInfo.processInfo.environment["FOX_SKIP_ONBOARDING"] == "1"
+    }
+
     init() {
         // Enter CLI mode only when the first arg is a known command. Xcode and
         // LaunchServices inject args like -NSDocumentRevisionsDebugMode and
@@ -35,7 +39,7 @@ struct FoxCleanApp: App {
     var body: some Scene {
         WindowGroup {
             Group {
-                if onboardingComplete {
+                if onboardingComplete || shouldSkipOnboarding {
                     MainWindow()
                         .environmentObject(appState)
                         .frame(minWidth: 900, minHeight: 600)
@@ -45,6 +49,7 @@ struct FoxCleanApp: App {
             }
             .environmentObject(theme)
             .preferredColorScheme(theme.appearance.colorScheme)
+            .tint(theme.accent.color)
             .onOpenURL { url in
                 appState.route(to: url)
                 NSApp.activate(ignoringOtherApps: true)

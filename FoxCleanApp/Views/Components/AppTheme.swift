@@ -31,15 +31,48 @@ enum AppearanceMode: String, CaseIterable, Identifiable {
     }
 }
 
+enum AccentChoice: String, CaseIterable, Identifiable {
+    case system, blue, green, orange, purple, pink
+    var id: String { rawValue }
+
+    var label: String {
+        switch self {
+        case .system: return "System Accent"
+        case .blue: return "Blue"
+        case .green: return "Green"
+        case .orange: return "Orange"
+        case .purple: return "Purple"
+        case .pink: return "Pink"
+        }
+    }
+
+    var color: Color {
+        switch self {
+        case .system: return .accentColor
+        case .blue: return Tint.blue
+        case .green: return Tint.green
+        case .orange: return Tint.orange
+        case .purple: return Tint.purple
+        case .pink: return Tint.pink
+        }
+    }
+}
+
 @MainActor
 final class ThemeManager: ObservableObject {
     static let shared = ThemeManager()
 
     @AppStorage("FoxClean.Appearance") private var rawValue: String = AppearanceMode.system.rawValue
+    @AppStorage("FoxClean.Accent") private var rawAccent: String = AccentChoice.system.rawValue
 
     var appearance: AppearanceMode {
         get { AppearanceMode(rawValue: rawValue) ?? .system }
         set { rawValue = newValue.rawValue; objectWillChange.send() }
+    }
+
+    var accent: AccentChoice {
+        get { AccentChoice(rawValue: rawAccent) ?? .system }
+        set { rawAccent = newValue.rawValue; objectWillChange.send() }
     }
 }
 

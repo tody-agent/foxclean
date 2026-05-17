@@ -76,9 +76,13 @@ require_patterns FoxCleanApp/Views/DashboardView.swift \
 require_patterns FoxCleanApp/Views/Settings/SettingsView.swift \
   'TabView' \
   'Label\("General"' \
+  'Label\("Privacy"' \
   'Label\("Cleaning"' \
   'Label\("Schedule"' \
   'Label\("About"' \
+  'AppearancePill\(selection:' \
+  'Picker\("Accent color"' \
+  'AccentChoice\.allCases' \
   'Toggle\("Launch FoxClean at login"' \
   'SMAppService\.mainApp\.register\(\)' \
   'SMAppService\.mainApp\.unregister\(\)' \
@@ -94,7 +98,21 @@ require_patterns FoxCleanApp/Views/Settings/SettingsView.swift \
   'Toggle\("Auto-clean after scan"' \
   'Toggle\("Auto-purge purgeable space"' \
   'Toggle\("Notify on completion"' \
+  'FullDiskAccessManager\.shared\.openFullDiskAccessSettings\(\)' \
+  'FullDiskAccessManager\.shared\.revealAppInFinder\(\)' \
+  'FullDiskAccessManager\.shared\.resetFullDiskAccess\(\)' \
   'https://github.com/tody-agent/foxclean' \
-  'https://github.com/tody-agent/foxclean/issues'
+  'https://github.com/tody-agent/foxclean/issues' \
+  'PureMac by momenbasel and Mole by tw93'
+
+require_patterns FoxCleanApp/FoxCleanApp.swift \
+  'FOX_SKIP_ONBOARDING' \
+  'theme\.accent\.color'
+
+require_patterns FoxCleanApp/Views/Components/AppTheme.swift \
+  'enum AccentChoice' \
+  'case system, blue, green, orange, purple, pink' \
+  '@AppStorage\("FoxClean.Accent"\)' \
+  'var accent: AccentChoice'
 
 echo "GUI onboarding/dashboard/settings static checks passed."
