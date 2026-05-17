@@ -166,6 +166,32 @@ if have_command gh; then
     pass "GitHub CLI is authenticated"
     if gh repo view "$EXPECTED_GITHUB_REPO" >/dev/null 2>&1; then
       pass "GitHub repository is accessible: $EXPECTED_GITHUB_REPO"
+      if gh api "repos/$EXPECTED_GITHUB_REPO/pages" --jq '.build_type == "workflow" and (.html_url | length > 0)' 2>/dev/null | rg -q '^true$'; then
+        pass "GitHub Pages is enabled for workflow deploys"
+      else
+        block "GitHub Pages is not enabled for workflow deploys"
+      fi
+      head_sha="$(git rev-parse HEAD 2>/dev/null || true)"
+      if [[ -n "$head_sha" ]]; then
+        ci_json="$(gh run list --repo "$EXPECTED_GITHUB_REPO" --commit "$head_sha" --json workflowName,status,conclusion --limit 20 2>/dev/null || true)"
+        if ruby -rjson -e '
+          runs = JSON.parse(STDIN.read)
+          required = %w[Build Test Lint Pages]
+          latest = {}
+          runs.each do |run|
+            name = run.fetch("workflowName", "")
+            latest[name] ||= run if required.include?(name)
+          end
+          missing = required.reject { |name| latest[name]&.fetch("status") == "completed" && latest[name]&.fetch("conclusion") == "success" }
+          exit(missing.empty? ? 0 : 1)
+        ' <<<"$ci_json"; then
+          pass "latest GitHub Build/Test/Lint/Pages runs passed for HEAD"
+        else
+          block "latest GitHub Build/Test/Lint/Pages runs have not all passed for HEAD"
+        fi
+      else
+        block "cannot determine HEAD SHA for GitHub workflow verification"
+      fi
     else
       block "GitHub repository is not accessible through gh: $EXPECTED_GITHUB_REPO"
     fi

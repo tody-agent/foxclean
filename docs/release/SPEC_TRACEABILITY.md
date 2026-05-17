@@ -22,7 +22,7 @@ Status legend:
 | Foundation targets | `Package.swift`, `project.yml`, `FoxCleanApp`, `Sources/FoxCleanCore`, `Sources/FoxCleanCLI`; Xcode builds pass. | Pass |
 | MIT license and credits | `LICENSE`, `NOTICE`, `README.md`, `README.vi.md`. | Pass |
 | Root ignore/tooling | `.gitignore`, `.swiftlint.yml`, `.swift-format`, `.editorconfig`, `Brewfile`. | Pass |
-| CI workflows | `.github/workflows/build.yml`, `test.yml`, `lint.yml`, `release.yml` plus `script/check_github_workflows.sh` static validation for required files, YAML parsing, macOS runners, build/test/lint/package commands, and artifact upload. Actual PR checks still require GitHub. | Partial |
+| CI workflows | `.github/workflows/build.yml`, `test.yml`, `lint.yml`, `release.yml` plus `script/check_github_workflows.sh` static validation for required files, YAML parsing, macOS runners, build/test/lint/package commands, and artifact upload. `Build`, `Test`, `Lint`, and `Pages` passed on `main` commit `14bbe96`. | Pass |
 | Foxie mascot | `FoxCleanApp/Foxie/FoxieView.swift`; integrated in app shell. | Pass |
 | Scan engine | `Sources/FoxCleanCore/Scanning/*`; covered by `swift test`, including 20 app/path fixtures, deep team/entitlement matching, and CLI smoke JSON. Bundled JSON rules decode through typed schemas. | Pass |
 | Cleaning safety | `FileOperator`, `OperationLog`, `RollbackEngine`; dry-run, symlink escape rejection, and roundtrip tests exist. | Pass |
@@ -52,7 +52,7 @@ Status legend:
 | Universal binary | `script/package_release.sh` enforces arm64+x86_64 slices for `FoxClean`, embedded `fox`, and `FoxCleanCore.framework`; verifier records `lipo -archs`. | Pass |
 | Homebrew publication | Draft formula exists at `homebrew/foxclean.rb` with concrete SHA-256 generated from the local DMG; publication still requires tap/PR access. | Blocked |
 | Homebrew app CLI symlink target | `FoxClean.app/Contents/Resources/fox` is embedded with `FoxCleanCore.framework`; verifier executes embedded `fox --version`; `script/check_homebrew_formula.sh` verifies the cask URL, SHA-256, app stanza, binary stanza, zap paths, and Ruby syntax. | Pass |
-| GitHub release/site/social launch | Public repo `https://github.com/tody-agent/foxclean` exists and `main` is pushed. Release workflow can create GitHub Release assets; `docs/site/index.html` and `.github/workflows/pages.yml` scaffold GitHub Pages; `docs/release/LAUNCH_POSTS.md` contains HN/Product Hunt/X drafts. Actual release publication still needs signed/notarized artifacts and repo Pages settings. | Partial |
+| GitHub release/site/social launch | Public repo `https://github.com/tody-agent/foxclean` exists and `main` is pushed. `Build`, `Test`, `Lint`, and `Pages` passed on `main`; GitHub Pages is enabled at `https://tody-agent.github.io/foxclean/`; release workflow can create GitHub Release assets; `docs/release/LAUNCH_POSTS.md` contains HN/Product Hunt/X drafts. Actual release publication still needs signed/notarized artifacts. | Partial |
 | Local verification gate | `script/verify_local.sh --launch --package` passed on 2026-05-17. | Pass |
 
 ## Verification Performed
@@ -126,7 +126,7 @@ controlled gates are done:
 - Apple Developer ID signing certificate is installed.
 - Notarization credentials are configured and a stapled DMG is produced.
 - GitHub repository exists at `https://github.com/tody-agent/foxclean`; Pages
-  settings and release publication still require maintainer action after
-  signing/notarization.
+  is enabled at `https://tody-agent.github.io/foxclean/`; release publication
+  still requires maintainer action after signing/notarization.
 - Homebrew publication or PR access is available.
 - macOS Full Disk Access and Touch ID prompts are manually granted/tested.

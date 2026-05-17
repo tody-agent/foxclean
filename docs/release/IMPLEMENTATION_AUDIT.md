@@ -56,8 +56,9 @@ Last release preflight:
 - Passing checks: DMG exists, SHA-256 sidecar exists, checksum verifies,
   `hdiutil verify` passes, release workflow exists, GitHub workflow static
   validation passes, git remote origin is configured, GitHub CLI is
-  authenticated, `tody-agent/foxclean` is accessible, Homebrew cask draft
-  exists, Homebrew cask static validation passes
+  authenticated, `tody-agent/foxclean` is accessible, GitHub Pages is enabled
+  for workflow deploys, latest GitHub Build/Test/Lint/Pages runs passed for
+  `HEAD`, Homebrew cask draft exists, Homebrew cask static validation passes
 - Blockers: Developer ID Application identity, notarization env vars,
   Homebrew publication/PR access, Full Disk Access, Touch ID authorization,
   manual VoiceOver/contrast/RTL/Gatekeeper QA
@@ -81,6 +82,16 @@ Updated GitHub target:
 - URL: `https://github.com/tody-agent/foxclean`
 - Evidence: `gh repo view tody-agent/foxclean --json nameWithOwner,url,visibility`
   returned `PUBLIC`
+
+GitHub CI and Pages:
+
+- Date: 2026-05-17
+- Latest pushed commit: `14bbe96`
+- Workflows: `Build`, `Test`, `Lint`, and `Pages` all completed successfully
+  on `main`
+- Pages URL: `https://tody-agent.github.io/foxclean/`
+- Evidence: `gh run list --repo tody-agent/foxclean --limit 8` and
+  `gh api repos/tody-agent/foxclean/pages`
 
 ## Implemented With Local Evidence
 
@@ -111,7 +122,7 @@ Updated GitHub target:
 | Codex run action | `.codex/environments/environment.toml` exposes `Run` and `Verify` actions backed by project-local scripts. |
 | Release scaffolding | CI workflows, Brewfile, lint configs, Homebrew formula draft, release notes, QA checklist, security docs. |
 | GitHub workflow validation | `script/check_github_workflows.sh` statically verifies required workflow files, YAML parseability, macOS runners, build/test/lint/package commands, GitHub Release creation, and release artifact upload of the DMG, checksum, and Homebrew cask. |
-| GitHub Pages scaffold | `docs/site/index.html` provides a static landing page using the app icon as the visual asset; `.github/workflows/pages.yml` deploys it through GitHub Pages when repository settings permit it; `script/check_pages_site.sh` statically validates the site and workflow. |
+| GitHub Pages scaffold | `docs/site/index.html` provides a static landing page using the app icon as the visual asset; `.github/workflows/pages.yml` deploys it through GitHub Pages; GitHub Pages is enabled for `https://tody-agent.github.io/foxclean/`; `script/check_pages_site.sh` statically validates the site and workflow. |
 | Launch content scaffold | `docs/release/LAUNCH_POSTS.md` contains draft HN, Product Hunt, and X/Twitter launch copy; `script/check_release_docs.sh` verifies release notes, QA, audit, traceability, checksum references, preflight command, and launch drafts. |
 | Homebrew validation | `script/check_homebrew_formula.sh` verifies cask syntax, version, release URL, app stanza, embedded CLI binary stanza, and zap cleanup paths. |
 | Homebrew SHA update | `script/update_homebrew_cask_sha.sh` rewrites `homebrew/foxclean.rb` from `dist/FoxClean-1.0.0.dmg.sha256`; `script/package_release.sh` runs it after each DMG build. |
@@ -137,7 +148,7 @@ require credentials, account ownership, network publishing, or manual OS consent
 | Notarization and stapling | Apple notary credentials and network submission. |
 | GitHub release upload | Repository ownership and authenticated `gh` or API credentials. |
 | Homebrew publication | Tap ownership or PR workflow access. |
-| GitHub Pages / marketing launch | Repository settings and public publishing approval. |
+| GitHub release publication | Signed/notarized release artifact and maintainer approval to publish the public release. |
 | Full Disk Access | User must grant macOS Privacy & Security permission manually. |
 | Touch ID authorization | Real device policy and enrolled biometrics. |
 | Public update feed | Hosting endpoint and signing/update strategy. |
