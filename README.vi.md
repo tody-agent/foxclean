@@ -41,6 +41,27 @@ Chúng tôi ưu tiên sự an toàn cho dữ liệu của bạn.
 - **Chuyển vào Thùng rác**: Sử dụng cờ `--confirm` để di chuyển các mục vào Thùng rác.
 - **Xóa Vĩnh viễn**: Xóa vĩnh viễn thực sự yêu cầu cả hai cờ `--permanent` và `--confirm-permanent`, ngăn ngừa những thảm họa vô tình.
 
+## 💡 Động lực Phát triển & Bài toán "Vibe Coding"
+
+**Tại sao lại tạo ra một công cụ dọn dẹp Mac khác?**
+Hệ sinh thái macOS đã có rất nhiều ứng dụng dọn dẹp (như CleanMyMac, Onyx, Pearcleaner...), nhưng hầu hết đều có những "pain points" (điểm yếu) sau:
+- **Thương mại & Mã nguồn kín:** Quá nặng nề, yêu cầu trả phí đăng ký (subscription), chứa nhiều telemetry theo dõi người dùng hoặc quảng cáo.
+- **Hạn chế của Mã nguồn mở:** Thường thiếu giao diện người dùng (UI) hiện đại, được trau chuốt, hoặc chỉ là những tập lệnh (script) đơn giản không khai thác hết sức mạnh của hệ thống gốc.
+
+**Vấn đề của "Vibe Coding"**
+Trong kỷ nguyên phát triển phần mềm với sự hỗ trợ của AI ("vibe coding"), việc xây dựng một ứng dụng macOS hoàn chỉnh với quyền truy cập hệ thống và quản lý state phức tạp của SwiftUI từ đầu là một cơn ác mộng. AI thường xuyên gặp khó khăn và nhầm lẫn với các tệp `project.pbxproj` khổng lồ, dễ gây conflict và các kiến trúc source code liên kết quá chặt chẽ. Các source gốc không đáp ứng được nhu cầu của quy trình làm việc hướng AI hiện đại vì chúng dựa vào cấu trúc dự án Xcode truyền thống, khó bảo trì.
+
+**Giải pháp của FoxClean**
+FoxClean giải quyết vấn đề này bằng cách kết hợp trải nghiệm người dùng SwiftUI gốc tuyệt đẹp từ **PureMac** với các bộ quy tắc dọn dẹp mạnh mẽ được lấy cảm hứng từ **Mole**.
+Bằng cách sử dụng `XcodeGen` (`project.yml`), FoxClean tách biệt hoàn toàn phần lõi (`FoxCleanCore`), công cụ dòng lệnh (`FoxCleanCLI`) và giao diện (`FoxCleanApp`). Kiến trúc này cực kỳ thân thiện với "vibe coding" — AI chỉ cần sửa đổi các tệp Swift rõ ràng và một tệp YAML đơn giản, loại bỏ hoàn toàn rủi ro conflict tệp `pbxproj`.
+
+## 🙏 Lời Cảm Ơn
+
+FoxClean được xây dựng dựa trên nền tảng của những dự án tuyệt vời. Xin gửi lời cảm ơn chân thành đến các tác giả:
+- **momenbasel** - tác giả của [PureMac](https://github.com/momenbasel/PureMac): Đã cung cấp nền tảng giao diện SwiftUI gốc tuyệt đẹp và kiến trúc engine quét hệ thống.
+- **tw93** - tác giả của [Mole](https://github.com/tw93/mole): Đã truyền cảm hứng cho các quy tắc dọn dẹp mạnh mẽ và luồng công việc CLI.
+- Cộng đồng mã nguồn mở với các công cụ như `XcodeGen` đã giúp hiện thực hóa kiến trúc hiện đại này.
+
 ## 🗑️ Gỡ cài đặt FoxClean
 
 Nếu bạn cần gỡ bỏ FoxClean khỏi hệ thống, bạn có hai lựa chọn:

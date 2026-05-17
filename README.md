@@ -41,6 +41,27 @@ We prioritize your data's safety.
 - **Trash moves**: Use the `--confirm` flag to explicitly move items to the Trash.
 - **Permanent Deletion**: True permanent deletion requires both `--permanent` and `--confirm-permanent` flags, preventing accidental disasters.
 
+## 💡 Motivation & The "Vibe Coding" Challenge
+
+**Why build another Mac cleaner?**
+The macOS ecosystem has many cleaner apps (like CleanMyMac, Onyx, Pearcleaner), but most suffer from key pain points:
+- **Commercial & Closed Source:** Often heavy, subscription-based, bloated with telemetry tracking, or containing intrusive ads.
+- **Open-source Limitations:** Frequently lack a polished, modern UI, or they are just basic bash scripts without the power of deep native integration.
+
+**The "Vibe Coding" Problem**
+In the era of AI-assisted development ("vibe coding"), building a full-fledged macOS app with file-system privileges and complex SwiftUI state management from scratch is a nightmare. AI often struggles and gets confused by massive `project.pbxproj` files, which easily lead to merge conflicts and tightly coupled architectures. The original sources didn't meet the needs of a modern AI-driven workflow because they relied on traditional, hard-to-maintain Xcode project structures.
+
+**Our Solution**
+FoxClean solves this by combining the beautiful native SwiftUI user experience from **PureMac** with powerful cleanup rules inspired by **Mole**. 
+By utilizing `XcodeGen` (`project.yml`), FoxClean completely separates the Core logic (`FoxCleanCore`), the CLI tool (`FoxCleanCLI`), and the UI (`FoxCleanApp`). This modular architecture is completely "vibe coding" friendly—AI only needs to modify clean Swift files and a simple YAML file, avoiding `pbxproj` merge conflicts entirely.
+
+## 🙏 Acknowledgements
+
+FoxClean stands on the shoulders of giants. Special thanks to:
+- **momenbasel** for [PureMac](https://github.com/momenbasel/PureMac) - Providing the beautiful native SwiftUI baseline and scan engine architecture.
+- **tw93** for [Mole](https://github.com/tw93/mole) - Inspiring the robust cleanup rules and CLI workflows.
+- The open-source community for tools like `XcodeGen` that made this modern architecture possible.
+
 ## 🗑️ Uninstalling FoxClean
 
 If you ever need to remove FoxClean from your system, you have two options:
