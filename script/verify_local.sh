@@ -138,6 +138,7 @@ run_log "localization" ./script/check_localization.sh
 run_log "swiftui-localization-keys" ./script/check_swiftui_localization_keys.sh
 run_log "accessibility-static" ./script/check_accessibility_static.sh
 run_log "app-runtime-static" ./script/check_app_runtime_static.sh
+run_log "gui-static" ./script/check_gui_static.sh
 run_log "clean-ui-static" ./script/check_clean_ui_static.sh
 
 step "Xcode builds"

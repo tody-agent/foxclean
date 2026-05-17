@@ -28,7 +28,7 @@ Status legend:
 | Cleaning safety | `FileOperator`, `OperationLog`, `RollbackEngine`; dry-run, symlink escape rejection, and roundtrip tests exist. | Pass |
 | Full Disk Access | PureMac-derived `FullDiskAccessManager.swift` exists in app services; actual macOS consent is manual. | Partial |
 | CLI command surface | `Sources/FoxCleanCLI/main.swift`; smoke checked `--version`, non-TTY no-args usage, `status`, `scan apps --json`, `analyze Sources --json`, completions, `open --print-url`, and Touch ID dry-runs. | Pass |
-| GUI onboarding/dashboard/settings | SwiftUI views under `FoxCleanApp/Views`; app build and launch verification pass. Manual visual/snapshot checks are not automated. | Partial |
+| GUI onboarding/dashboard/settings | SwiftUI views under `FoxCleanApp/Views`; `script/check_gui_static.sh` verifies onboarding page flow, Full Disk Access controls, dashboard scan/clean states, destructive clean confirmation, category toggles, and settings tabs/toggles for startup, menu bar, scanning, safety, accessibility, scheduling, and repository links. App build and launch verification pass. | Pass |
 | Keyboard shortcuts | `FoxCleanApp.swift` command menus provide navigation shortcuts, Smart Scan shortcut, Full Disk Access shortcut, and a Help -> Keyboard Shortcuts window. App build/launch verifier passes. | Pass |
 | Clean/uninstall/orphans UI | PureMac-derived app views and services exist; `script/check_clean_ui_static.sh` verifies at least 9 cleanup categories, sidebar category rendering, select/deselect controls, destructive confirmations, protected app hiding, orphan safety policy, remove actions, and Finder reveal affordances. | Pass |
 | Disk analyzer | `DiskScanner`, mtime-based persistent SQLite scan cache in Application Support, squarified `TreemapLayout`, Analyzer Tree/Treemap modes, breadcrumb zoom, Finder reveal, guarded Move to Trash with `OperationLog`, and `fox analyze`; tests cover cache persistence behavior and treemap area/rows. | Pass |
@@ -76,6 +76,7 @@ Verified:
 - `./script/check_accessibility_static.sh`
 - `./script/check_clean_ui_static.sh`
 - `./script/check_app_runtime_static.sh`
+- `./script/check_gui_static.sh`
 - `xcodegen generate`
 - `xcodebuild -scheme FoxCleanCore -destination 'platform=macOS' build`
 - `xcodebuild -scheme FoxCleanCLI -destination 'platform=macOS' build`
