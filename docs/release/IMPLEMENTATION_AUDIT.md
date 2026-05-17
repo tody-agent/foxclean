@@ -86,9 +86,9 @@ Updated GitHub target:
 GitHub CI and Pages:
 
 - Date: 2026-05-17
-- Latest pushed commit: `14bbe96`
 - Workflows: `Build`, `Test`, `Lint`, and `Pages` all completed successfully
-  on `main`
+  on `main`; `script/release_preflight.sh` verifies this against the current
+  `HEAD`
 - Pages URL: `https://tody-agent.github.io/foxclean/`
 - Evidence: `gh run list --repo tody-agent/foxclean --limit 8` and
   `gh api repos/tody-agent/foxclean/pages`

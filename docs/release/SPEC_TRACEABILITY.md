@@ -22,7 +22,7 @@ Status legend:
 | Foundation targets | `Package.swift`, `project.yml`, `FoxCleanApp`, `Sources/FoxCleanCore`, `Sources/FoxCleanCLI`; Xcode builds pass. | Pass |
 | MIT license and credits | `LICENSE`, `NOTICE`, `README.md`, `README.vi.md`. | Pass |
 | Root ignore/tooling | `.gitignore`, `.swiftlint.yml`, `.swift-format`, `.editorconfig`, `Brewfile`. | Pass |
-| CI workflows | `.github/workflows/build.yml`, `test.yml`, `lint.yml`, `release.yml` plus `script/check_github_workflows.sh` static validation for required files, YAML parsing, macOS runners, build/test/lint/package commands, and artifact upload. `Build`, `Test`, `Lint`, and `Pages` passed on `main` commit `14bbe96`. | Pass |
+| CI workflows | `.github/workflows/build.yml`, `test.yml`, `lint.yml`, `release.yml` plus `script/check_github_workflows.sh` static validation for required files, YAML parsing, macOS runners, build/test/lint/package commands, and artifact upload. `script/release_preflight.sh` verifies `Build`, `Test`, `Lint`, and `Pages` passed for the current `HEAD`. | Pass |
 | Foxie mascot | `FoxCleanApp/Foxie/FoxieView.swift`; integrated in app shell. | Pass |
 | Scan engine | `Sources/FoxCleanCore/Scanning/*`; covered by `swift test`, including 20 app/path fixtures, deep team/entitlement matching, and CLI smoke JSON. Bundled JSON rules decode through typed schemas. | Pass |
 | Cleaning safety | `FileOperator`, `OperationLog`, `RollbackEngine`; dry-run, symlink escape rejection, and roundtrip tests exist. | Pass |
