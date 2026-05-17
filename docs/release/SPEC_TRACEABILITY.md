@@ -18,7 +18,7 @@ Status legend:
 | Read `sped.md` / project spec | Original source file present in workspace was `spec.md`; `sped.md` now exists as an alias note pointing to `spec.md`. `spec.md` was inspected and mapped here. | Pass |
 | Use two downloaded repos/folders | `PureMac/` and `Mole/` are present; app baseline under `FoxCleanApp/`, rule/hint resources and scripts derive from them. | Pass |
 | Create OpenSpec with 8 changes | `openspec/changes/*/{proposal.md,design.md,tasks.md,specs/.../spec.md}` now exists for all 8 changes. | Pass |
-| Local git repository | `git rev-parse --is-inside-work-tree` returns `true`; `origin` points at `https://github.com/foxclean/foxclean.git`. Public GitHub repo existence/access still requires account ownership and is checked by preflight. | Pass |
+| Local git repository | `git rev-parse --is-inside-work-tree` returns `true`; initial commit `cbc9f37` exists; `origin` points at `https://github.com/foxclean/foxclean.git`. Public GitHub repo existence/access still requires account ownership and is checked by preflight. | Pass |
 | Foundation targets | `Package.swift`, `project.yml`, `FoxCleanApp`, `Sources/FoxCleanCore`, `Sources/FoxCleanCLI`; Xcode builds pass. | Pass |
 | MIT license and credits | `LICENSE`, `NOTICE`, `README.md`, `README.vi.md`. | Pass |
 | Root ignore/tooling | `.gitignore`, `.swiftlint.yml`, `.swift-format`, `.editorconfig`, `Brewfile`. | Pass |

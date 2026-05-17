@@ -66,7 +66,7 @@ Last release preflight:
 | Area | Evidence |
 | --- | --- |
 | Project foundation | `Package.swift`, `project.yml`, generated `FoxClean.xcodeproj`, `FoxCleanCore`, `FoxCleanCLI`, `FoxCleanApp`. |
-| Local repository scaffold | `.git/` initialized locally and `origin` is configured for `https://github.com/foxclean/foxclean.git`; public repository existence/access remains external and is checked by `script/release_preflight.sh`. |
+| Local repository scaffold | `.git/` initialized locally, initial commit `cbc9f37` created, and `origin` is configured for `https://github.com/foxclean/foxclean.git`; public repository existence/access remains external and is checked by `script/release_preflight.sh`. |
 | PureMac fork baseline | App code copied into `FoxCleanApp`, renamed to FoxClean identifiers and bundle metadata. |
 | Mole-derived cleanup knowledge | `Sources/FoxCleanCore/Resources/Data/cleanup_hints.json`, `Resources/data/locations.json`, `Resources/data/conditions.json`, extraction tools under `tools/`. |
 | Bundled data validation | `RuleDatabase.bundled()`, `loadBundledLocations()`, `loadBundledConditions()`, and `testBundledRuleResourcesDecode` validate the four JSON resource schemas. |
@@ -99,7 +99,7 @@ Last release preflight:
 | App runtime validation | `script/check_app_runtime_static.sh` guards the menu bar and sidebar implementation that fixed the startup hang/click regression. |
 | Local release packaging | `script/package_release.sh` builds Release, verifies embedded `fox`, stages a drag-install Applications symlink, creates `dist/FoxClean-1.0.0.dmg` plus `dist/FoxClean-1.0.0.dmg.sha256`, updates the Homebrew cask SHA, and supports optional Developer ID signing/notarization through Apple notary API key or Apple ID password env vars. |
 | Release preflight | `script/release_preflight.sh` checks the local DMG/checksum, signing identity env, API-key or Apple-ID notarization env, GitHub remote/auth/repository readiness, Homebrew cask scaffold, and manual OS gates; `--strict` fails when external release prerequisites are missing. |
-| Completion audit | `script/completion_audit.sh` restates the objective and checks spec/sped inputs, two downloaded source folders, OpenSpec changes, project targets, verifier evidence, release artifacts, Homebrew cask validation, and external/manual blockers. |
+| Completion audit | `script/completion_audit.sh` restates the objective and checks spec/sped inputs, two downloaded source folders, OpenSpec changes, project targets, git commit/remote state, verifier evidence, release artifacts, Homebrew cask validation, and external/manual blockers. |
 | Universal binary | Release packaging builds `generic/platform=macOS` with `ARCHS="arm64 x86_64"` and fails unless app, embedded CLI, and core framework contain both slices. |
 | Telemetry-free gate | `script/check_telemetry_free.sh` scans source/build manifests for analytics SDKs, tracking identifiers, and outbound network APIs. |
 | Multi-language docs | `README.md`, `README.vi.md`, `README.en.md`, `README.es.md`, `README.ja.md`, `README.zh-Hans.md`, `README.zh-Hant.md`, and `README.ar.md`. |

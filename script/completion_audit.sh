@@ -110,6 +110,17 @@ require_dir "Sources/FoxCleanCore" "shared core target"
 require_dir "Sources/FoxCleanCLI" "CLI target"
 require_file "LICENSE" "MIT license"
 require_file "NOTICE" "source credits"
+if commit="$(git rev-parse --short HEAD 2>/dev/null)"; then
+  pass "git repository has an initial commit: $commit"
+else
+  fail "git repository has no commit"
+fi
+origin_url="$(git config --get remote.origin.url || true)"
+if [[ "$origin_url" == *"github.com/foxclean/foxclean"* ]]; then
+  pass "git remote origin points at FoxClean release repository"
+else
+  fail "git remote origin does not point at github.com/foxclean/foxclean"
+fi
 
 echo
 echo "==> OpenSpec"
