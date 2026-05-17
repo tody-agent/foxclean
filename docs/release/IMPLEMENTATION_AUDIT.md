@@ -52,16 +52,15 @@ Last release preflight:
 
 - Date: 2026-05-17
 - Command: `script/release_preflight.sh`
-- Result: local distributable passed; 7 external/manual blockers remain
+- Result: local distributable passed; 6 external/manual blockers remain
 - Passing checks: DMG exists, SHA-256 sidecar exists, checksum verifies,
   `hdiutil verify` passes, release workflow exists, GitHub workflow static
   validation passes, git remote origin is configured, GitHub CLI is
-  authenticated, Homebrew cask draft exists, Homebrew cask static validation
-  passes
+  authenticated, `tody-agent/foxclean` is accessible, Homebrew cask draft
+  exists, Homebrew cask static validation passes
 - Blockers: Developer ID Application identity, notarization env vars,
-  GitHub repository publication until `tody-agent/foxclean` is created/pushed,
-  Homebrew publication/PR access, Full Disk Access, Touch ID authorization, manual
-  VoiceOver/contrast/RTL/Gatekeeper QA
+  Homebrew publication/PR access, Full Disk Access, Touch ID authorization,
+  manual VoiceOver/contrast/RTL/Gatekeeper QA
 
 Previous GitHub publication attempt:
 
@@ -78,15 +77,17 @@ Updated GitHub target:
 
 - Date: 2026-05-17
 - User instruction: create repo as `tody-agent/foxclean`
-- Status: URLs, Homebrew cask, release docs, preflight default, and in-app
-  Settings links now target `https://github.com/tody-agent/foxclean`
+- Status: public repo created and `main` pushed
+- URL: `https://github.com/tody-agent/foxclean`
+- Evidence: `gh repo view tody-agent/foxclean --json nameWithOwner,url,visibility`
+  returned `PUBLIC`
 
 ## Implemented With Local Evidence
 
 | Area | Evidence |
 | --- | --- |
 | Project foundation | `Package.swift`, `project.yml`, generated `FoxClean.xcodeproj`, `FoxCleanCore`, `FoxCleanCLI`, `FoxCleanApp`. |
-| Local repository scaffold | `.git/` initialized locally, commits exist, and `origin` is configured for `https://github.com/tody-agent/foxclean.git`; repository existence/access is checked by `script/release_preflight.sh`. |
+| Local repository scaffold | `.git/` initialized locally, commits exist, `origin` is configured for `https://github.com/tody-agent/foxclean.git`, and `main` tracks `origin/main`. Repository existence/access is checked by `script/release_preflight.sh`. |
 | PureMac fork baseline | App code copied into `FoxCleanApp`, renamed to FoxClean identifiers and bundle metadata. |
 | Mole-derived cleanup knowledge | `Sources/FoxCleanCore/Resources/Data/cleanup_hints.json`, `Resources/data/locations.json`, `Resources/data/conditions.json`, extraction tools under `tools/`. |
 | Bundled data validation | `RuleDatabase.bundled()`, `loadBundledLocations()`, `loadBundledConditions()`, and `testBundledRuleResourcesDecode` validate the four JSON resource schemas. |
