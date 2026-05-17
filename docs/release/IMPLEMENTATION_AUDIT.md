@@ -106,7 +106,7 @@ GitHub CI and Pages:
 | Cleaning core | `FileOperator`, `OperationLog`, `RollbackEngine`, dry-run first semantics, symlink escape rejection, and trash-based operations. |
 | Disk analyzer | `DiskScanner` with mtime-based persistent SQLite cache in Application Support, squarified `TreemapLayout`, CLI `fox analyze`, and `AnalyzerView` Tree/Treemap modes with breadcrumb zoom, Finder reveal, and guarded Move to Trash logging. |
 | System monitor | `SystemMonitor` and `MonitorView` for uptime, host CPU ticks, VM memory stats, network throughput, disk I/O throughput via IOKit storage statistics, thermal state, battery percent, disk, process count, top processes, and health metrics. |
-| Toolkit features | Installer cleanup, project purge, and optimize flows in core/CLI/SwiftUI views; project purge reads `~/.config/foxclean/purge_paths`; installer scanning includes source labels for Homebrew, Mail, iCloud, downloads, shared folders, and app caches; optimizer tasks include command previews, admin flags, and selected-task dry-runs. |
+| Toolkit features | Installer cleanup, project purge, and optimize flows in core/CLI/SwiftUI views; project purge reads `~/.config/foxclean/purge_paths`; installer scanning includes source labels for Homebrew, Mail, iCloud, downloads, shared folders, and app caches; optimizer tasks include command previews, admin flags, selected-task dry-runs, `~/.config/foxclean/optimize_whitelist`, skipped-task reports, and native macOS admin prompts for whitelisted admin commands. |
 | GUI shell | SwiftUI sidebar sections, dashboard, onboarding, settings, toolkit views, mascot component, and AppKit menu bar status item. |
 | Keyboard commands | App command menus route to dashboard/apps/orphans/toolkit sections, run Smart Scan, open Full Disk Access settings, and show the Help -> Keyboard Shortcuts window. |
 | Menu bar widget | `MenuBarController` installs an AppKit `NSStatusItem` controlled by Settings -> Show FoxClean in menu bar; `MenuBarMiniView` provides a mini CPU chart, health/memory metrics, and Smart Scan/Open/Monitor/Quit actions without using SwiftUI `MenuBarExtra`. |
@@ -114,6 +114,7 @@ GitHub CI and Pages:
 | App runtime static guard | `script/check_app_runtime_static.sh` fails if `MenuBarExtra` returns, and verifies `MenuBarController`, `NSStatusItem`, `NSPopover`, and local sidebar selection state remain present. |
 | GUI static guard | `script/check_gui_static.sh` verifies the onboarding page flow and Full Disk Access controls, dashboard scan/clean states and destructive confirmation, and settings tabs/toggles for startup, menu bar, scanning, safety, accessibility, scheduling, and repository links. |
 | Clean UI static guard | `script/check_clean_ui_static.sh` verifies cleanup categories, sidebar category rendering, select/deselect controls, destructive confirmations, protected app hiding, orphan safety policy, and Finder reveal affordances. |
+| Optimize static guard | `script/check_optimize_static.sh` verifies 6+ optimization tasks, whitelist loading, skipped-task reports, admin-prompt plumbing, CLI `--whitelist`/`--admin-prompt`, GUI Preview/Run Selected/Run All controls, progress UI, and optimizer unit tests. |
 | CLI | `fox scan`, `clean`, `uninstall`, `log`, `analyze`, `status`, `purge`, `installer`, `optimize`, `completion`, `open`, `touchid`, plus an interactive TUI when launched in a TTY with no args. |
 | Deep links | `FoxClean.app` registers the `foxclean://` URL scheme; `AppState.route(to:)` maps links to sidebar sections; `fox open <view>` invokes `/usr/bin/open`, with `--print-url` smoke checked. |
 | Shell completion | `fox completion zsh`, `fox completion bash`, and `fox completion fish` generate shell-specific scripts and are smoke checked by `script/verify_local.sh`. |
@@ -138,7 +139,7 @@ GitHub CI and Pages:
 | Universal binary | Release packaging builds `generic/platform=macOS` with `ARCHS="arm64 x86_64"` and fails unless app, embedded CLI, and core framework contain both slices. |
 | Telemetry-free gate | `script/check_telemetry_free.sh` scans source/build manifests for analytics SDKs, tracking identifiers, and outbound network APIs. |
 | Multi-language docs | `README.md`, `README.vi.md`, `README.en.md`, `README.es.md`, `README.ja.md`, `README.zh-Hans.md`, `README.zh-Hant.md`, and `README.ar.md`. |
-| Tests | `Tests/FoxCleanCoreTests/FoxCleanCoreTests.swift` covers core safety, scanning fixtures, symlink safety, logging, treemap layout, installer scanning, system monitor snapshots, optimizer task metadata, project custom paths, and disk/project behavior. CLI JSON smokes now parse output as JSON instead of only checking non-empty stdout. |
+| Tests | `Tests/FoxCleanCoreTests/FoxCleanCoreTests.swift` covers core safety, scanning fixtures, symlink safety, logging, treemap layout, installer scanning, system monitor snapshots, optimizer task metadata, optimizer whitelist/skipped-task behavior, project custom paths, and disk/project behavior. CLI JSON smokes now parse output as JSON instead of only checking non-empty stdout. |
 
 ## External Or Manual Gates
 

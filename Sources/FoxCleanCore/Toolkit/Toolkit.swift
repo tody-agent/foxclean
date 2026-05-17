@@ -160,6 +160,11 @@ public struct OptimizationReport: Codable, Sendable {
 }
 
 public struct Optimizer: Sendable {
+    public static var defaultWhitelistURL: URL {
+        FileManager.default.homeDirectoryForCurrentUser
+            .appendingPathComponent(".config/foxclean/optimize_whitelist")
+    }
+
     public let tasks: [OptimizationTaskDescriptor] = [
         .init(
             id: "flush-dns",
@@ -207,20 +212,50 @@ public struct Optimizer: Sendable {
 
     public init() {}
 
-    public func run(selectedTasks: Set<String>? = nil, dryRun: Bool = true) -> [OptimizationReport] {
-        let selected = selectedTasks?.map { $0.lowercased() }
-        return tasks.filter { task in
-            guard let selected else { return true }
-            return selected.contains(task.id) || selected.contains(task.name.lowercased())
-        }.map { task in
+    public static func loadWhitelist(from url: URL = Optimizer.defaultWhitelistURL) -> Set<String> {
+        guard let body = try? String(contentsOf: url, encoding: .utf8) else { return [] }
+        return Set(body
+            .split(whereSeparator: \.isNewline)
+            .map { $0.trimmingCharacters(in: .whitespacesAndNewlines).lowercased() }
+            .filter { !$0.isEmpty && !$0.hasPrefix("#") })
+    }
+
+    public func run(
+        selectedTasks: Set<String>? = nil,
+        dryRun: Bool = true,
+        whitelist: Set<String>? = nil,
+        includeSkipped: Bool = false,
+        allowAdminPrompt: Bool = false
+    ) -> [OptimizationReport] {
+        let selected = selectedTasks.map { Set($0.map { $0.lowercased() }) }
+        let allowed = whitelist.map { Set($0.map { $0.lowercased() }) }
+
+        return tasks.compactMap { task in
+            if let selected, !matches(task, in: selected) {
+                return includeSkipped
+                    ? report(task, success: true, skipped: true, message: "Skipped (not selected).")
+                    : nil
+            }
+            if let allowed, !allowed.isEmpty, !matches(task, in: allowed) {
+                return includeSkipped
+                    ? report(task, success: true, skipped: true, message: "Skipped (whitelisted).")
+                    : nil
+            }
             if dryRun {
                 return report(task, success: true, skipped: true, message: "Dry-run: \(task.commandPreview)")
             }
             if task.requiresAdmin {
-                return report(task, success: false, skipped: true, message: "Skipped: requires admin prompt. Run from the GUI or enable Touch ID sudo first.")
+                guard allowAdminPrompt else {
+                    return report(task, success: false, skipped: true, message: "Skipped: requires admin prompt. Run from the GUI or enable Touch ID sudo first.")
+                }
+                return runWithAdminPrompt(task)
             }
             return run(task)
         }
+    }
+
+    private func matches(_ task: OptimizationTaskDescriptor, in values: Set<String>) -> Bool {
+        values.contains(task.id) || values.contains(task.name.lowercased())
     }
 
     private func report(_ task: OptimizationTaskDescriptor, success: Bool, skipped: Bool, message: String) -> OptimizationReport {
@@ -251,6 +286,25 @@ public struct Optimizer: Sendable {
         default:
             return report(task, success: false, skipped: true, message: "Skipped: unsupported optimization task.")
         }
+    }
+
+    private func runWithAdminPrompt(_ task: OptimizationTaskDescriptor) -> OptimizationReport {
+        let shellCommand: String
+        switch task.id {
+        case "flush-dns":
+            shellCommand = "/usr/bin/dscacheutil -flushcache && /usr/bin/killall -HUP mDNSResponder"
+        default:
+            return report(task, success: false, skipped: true, message: "Skipped: no admin command is whitelisted for this task.")
+        }
+
+        let escaped = shellCommand
+            .replacingOccurrences(of: "\\", with: "\\\\")
+            .replacingOccurrences(of: "\"", with: "\\\"")
+        return runProcess(
+            task,
+            executable: "/usr/bin/osascript",
+            arguments: ["-e", "do shell script \"\(escaped)\" with administrator privileges"]
+        )
     }
 
     private func runProcess(_ task: OptimizationTaskDescriptor, executable: String, arguments: [String]) -> OptimizationReport {

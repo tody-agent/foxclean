@@ -140,6 +140,7 @@ run_log "accessibility-static" ./script/check_accessibility_static.sh
 run_log "app-runtime-static" ./script/check_app_runtime_static.sh
 run_log "gui-static" ./script/check_gui_static.sh
 run_log "clean-ui-static" ./script/check_clean_ui_static.sh
+run_log "optimize-static" ./script/check_optimize_static.sh
 
 step "Xcode builds"
 run_log "xcodebuild-core" xcodebuild -scheme FoxCleanCore -destination "platform=macOS" build
@@ -162,6 +163,7 @@ run_log "fox-touchid-status" swift run fox touchid status --json
 run_log "fox-touchid-enable-dry-run" swift run fox touchid enable --dry-run --json
 run_log "fox-touchid-disable-dry-run" swift run fox touchid disable --dry-run --json
 run_json_smoke "fox-optimize-dry-run" swift run fox optimize
+run_json_smoke "fox-optimize-whitelist-dry-run" swift run fox optimize --whitelist
 run_json_smoke "fox-scan-apps" swift run fox scan apps --json
 run_json_smoke "fox-scan-orphans" swift run fox scan orphans --json
 run_json_smoke "fox-clean-system-junk-dry-run" swift run fox clean systemJunk

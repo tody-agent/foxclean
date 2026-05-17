@@ -226,3 +226,9 @@
 "found" = "found";
 "freed" = "freed";
 "macOS blocks FoxClean from cleaning caches and uninstalling apps until you grant access." = "macOS blocks FoxClean from cleaning caches and uninstalling apps until you grant access.";
+
+/* Optimize UI */
+"Preview" = "Preview";
+"Run All" = "Run All";
+"Running optimization tasks…" = "Running optimization tasks…";
+"Use optimize_whitelist" = "Use optimize_whitelist";

@@ -499,11 +499,16 @@ struct ProjectPurgeView: View {
 struct OptimizeView: View {
     private let optimizer = Optimizer()
     @State private var selected: Set<String> = Set(Optimizer().tasks.map(\.id))
-    @State private var results: [String] = []
+    @State private var useWhitelist = false
+    @State private var isRunning = false
+    @State private var reports: [OptimizationReport] = []
 
     var body: some View {
         ToolPage(title: "Optimize", subtitle: "Run safe maintenance tasks. Admin tasks stay opt-in.") {
             VStack(alignment: .leading, spacing: 10) {
+                Toggle("Use optimize_whitelist", isOn: $useWhitelist)
+                    .help(Optimizer.defaultWhitelistURL.path)
+
                 ForEach(optimizer.tasks) { task in
                     Toggle(isOn: Binding(
                         get: { selected.contains(task.id) },
@@ -528,19 +533,77 @@ struct OptimizeView: View {
                         }
                     }
                 }
-                Button {
-                    results = optimizer.run(selectedTasks: selected, dryRun: true).map { report in
-                        "\(report.task): \(report.message)"
+
+                HStack {
+                    Button {
+                        run(selectedTasks: selected, dryRun: true)
+                    } label: {
+                        Label("Preview", systemImage: "eye")
                     }
-                } label: {
-                    Label("Run Selected", systemImage: "play.fill")
+                    Button {
+                        run(selectedTasks: selected, dryRun: false)
+                    } label: {
+                        Label("Run Selected", systemImage: "play.fill")
+                    }
+                    .buttonStyle(.borderedProminent)
+                    Button {
+                        let allTasks = Set(optimizer.tasks.map(\.id))
+                        selected = allTasks
+                        run(selectedTasks: allTasks, dryRun: false)
+                    } label: {
+                        Label("Run All", systemImage: "forward.end.fill")
+                    }
                 }
-                ForEach(results, id: \.self) { result in
-                    Label(result, systemImage: "checkmark.circle.fill")
-                        .foregroundStyle(Tint.green)
+                .disabled(isRunning)
+
+                if isRunning {
+                    ProgressView("Running optimization tasks…")
+                }
+
+                ForEach(reports, id: \.id) { report in
+                    Label {
+                        VStack(alignment: .leading, spacing: 2) {
+                            Text(report.task)
+                            Text(report.message)
+                                .font(.caption)
+                                .foregroundStyle(.secondary)
+                        }
+                    } icon: {
+                        Image(systemName: reportIcon(report))
+                            .foregroundStyle(reportColor(report))
+                    }
                 }
             }
         }
+    }
+
+    private func run(selectedTasks: Set<String>, dryRun: Bool) {
+        isRunning = true
+        reports = []
+        let whitelist = useWhitelist ? Optimizer.loadWhitelist() : nil
+        Task.detached {
+            let output = optimizer.run(
+                selectedTasks: selectedTasks,
+                dryRun: dryRun,
+                whitelist: whitelist,
+                includeSkipped: true,
+                allowAdminPrompt: true
+            )
+            await MainActor.run {
+                reports = output
+                isRunning = false
+            }
+        }
+    }
+
+    private func reportIcon(_ report: OptimizationReport) -> String {
+        if report.skipped { return "forward.fill" }
+        return report.success ? "checkmark.circle.fill" : "exclamationmark.triangle.fill"
+    }
+
+    private func reportColor(_ report: OptimizationReport) -> Color {
+        if report.skipped { return .secondary }
+        return report.success ? Tint.green : Tint.orange
     }
 }
 

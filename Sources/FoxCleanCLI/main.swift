@@ -177,7 +177,14 @@ struct FoxCLI {
 
     private static func optimize(_ args: [String]) {
         let selected = Set(values(after: "--tasks", in: args))
-        printJSON(Optimizer().run(selectedTasks: selected.isEmpty ? nil : selected, dryRun: !args.contains("--confirm")))
+        let whitelist = args.contains("--whitelist") ? Optimizer.loadWhitelist() : nil
+        printJSON(Optimizer().run(
+            selectedTasks: selected.isEmpty ? nil : selected,
+            dryRun: !args.contains("--confirm"),
+            whitelist: whitelist,
+            includeSkipped: args.contains("--whitelist"),
+            allowAdminPrompt: args.contains("--admin-prompt")
+        ))
     }
 
     private static func completion(_ args: [String]) {
@@ -559,7 +566,7 @@ struct FoxCLI {
           status [--watch]
           purge [--paths a,b]
           installer
-          optimize [--confirm]
+          optimize [--tasks id1,id2] [--whitelist] [--confirm] [--admin-prompt]
           completion {zsh,bash,fish}
           open [view] [--print-url]
           touchid {status,enable,disable} [--dry-run] [--json]

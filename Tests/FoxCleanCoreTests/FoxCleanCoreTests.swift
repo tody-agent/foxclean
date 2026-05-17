@@ -193,6 +193,35 @@ final class FoxCleanCoreTests: XCTestCase {
         XCTAssertEqual(reports.first?.skipped, true)
     }
 
+    func testOptimizerReportsSkippedTasksAndWhitelist() throws {
+        let optimizer = Optimizer()
+        let reports = optimizer.run(
+            selectedTasks: ["clear-quicklook-cache"],
+            dryRun: true,
+            whitelist: ["clear-quicklook-cache"],
+            includeSkipped: true
+        )
+        XCTAssertEqual(reports.count, optimizer.tasks.count)
+        XCTAssertEqual(reports.first(where: { $0.id == "clear-quicklook-cache" })?.message.hasPrefix("Dry-run:"), true)
+        XCTAssertTrue(reports.filter(\.skipped).count >= optimizer.tasks.count - 1)
+        XCTAssertTrue(reports.contains { $0.message == "Skipped (not selected)." })
+
+        let admin = optimizer.run(selectedTasks: ["flush-dns"], dryRun: false, includeSkipped: true, allowAdminPrompt: false)
+        XCTAssertEqual(admin.first?.id, "flush-dns")
+        XCTAssertEqual(admin.first?.success, false)
+        XCTAssertEqual(admin.first?.skipped, true)
+        XCTAssertTrue(admin.first?.message.contains("requires admin prompt") == true)
+    }
+
+    func testOptimizerLoadsWhitelistFile() throws {
+        let url = FileManager.default.temporaryDirectory
+            .appendingPathComponent("foxclean-optimize-whitelist-\(UUID().uuidString)")
+        try "# comment\nflush-dns\nClear QuickLook Cache\n\n".write(to: url, atomically: true, encoding: .utf8)
+        defer { try? FileManager.default.removeItem(at: url) }
+
+        XCTAssertEqual(Optimizer.loadWhitelist(from: url), ["flush-dns", "clear quicklook cache"])
+    }
+
     func testOperationLogRoundTrip() async throws {
         let dir = FileManager.default.temporaryDirectory.appendingPathComponent("foxclean-log-\(UUID().uuidString)")
         let log = OperationLog(directory: dir)
