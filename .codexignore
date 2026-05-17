@@ -1,0 +1,30 @@
+# Ignore testing files
+Tests/
+*Tests*
+
+# Ignore specification and idea files
+spec.md
+sped.md
+Idea_fox_clean.md
+openspec/
+docs/
+
+# Ignore resources/assets
+screenshot/
+Mole-main.zip
+PureMac-main.zip
+*.zip
+
+# Ignore build artifacts and configs
+dist/
+.build/
+*.xcodeproj/
+DerivedData/
+.codex/
+.github/
+
+# Ignore scripts and tools
+scripts/
+script/
+tools/
+homebrew/

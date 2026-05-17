@@ -41,6 +41,21 @@ We prioritize your data's safety.
 - **Trash moves**: Use the `--confirm` flag to explicitly move items to the Trash.
 - **Permanent Deletion**: True permanent deletion requires both `--permanent` and `--confirm-permanent` flags, preventing accidental disasters.
 
+## 🗑️ Uninstalling FoxClean
+
+If you ever need to remove FoxClean from your system, you have two options:
+
+**1. Standard macOS way:**
+- Open `Finder` and go to the `Applications` folder.
+- Drag `FoxClean.app` to the Trash (or right-click and select "Move to Trash").
+- Empty the Trash.
+
+**2. Complete removal via CLI:**
+To completely remove FoxClean and all its associated data (caches, preferences, logs, etc.), you can use its own CLI before deleting the app:
+```sh
+fox uninstall dev.foxclean.app --confirm
+```
+
 ## 🏗️ Build Instructions
 
 To build the FoxClean app and CLI from source:

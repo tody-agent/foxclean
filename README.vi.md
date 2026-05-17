@@ -41,6 +41,21 @@ Chúng tôi ưu tiên sự an toàn cho dữ liệu của bạn.
 - **Chuyển vào Thùng rác**: Sử dụng cờ `--confirm` để di chuyển các mục vào Thùng rác.
 - **Xóa Vĩnh viễn**: Xóa vĩnh viễn thực sự yêu cầu cả hai cờ `--permanent` và `--confirm-permanent`, ngăn ngừa những thảm họa vô tình.
 
+## 🗑️ Gỡ cài đặt FoxClean
+
+Nếu bạn cần gỡ bỏ FoxClean khỏi hệ thống, bạn có hai lựa chọn:
+
+**1. Cách thông thường trên macOS:**
+- Mở `Finder` và đi đến thư mục `Applications` (Ứng dụng).
+- Kéo `FoxClean.app` vào Thùng rác (hoặc nhấp chuột phải và chọn "Move to Trash").
+- Làm trống Thùng rác.
+
+**2. Xóa triệt để qua CLI:**
+Để gỡ bỏ hoàn toàn FoxClean và tất cả dữ liệu liên quan (bộ nhớ cache, tùy chọn, nhật ký, v.v.), bạn có thể sử dụng chính CLI của nó trước khi xóa ứng dụng:
+```sh
+fox uninstall dev.foxclean.app --confirm
+```
+
 ## 🏗️ Hướng dẫn Xây dựng (Build)
 
 Để xây dựng ứng dụng FoxClean và CLI từ mã nguồn:

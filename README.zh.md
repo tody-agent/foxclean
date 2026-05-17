@@ -41,6 +41,21 @@ FoxClean 的核心是一个强大的共享引擎，确保应用程序与 CLI 之
 - **移至废纸篓**: 使用 `--confirm` 标志显式地将项目移至废纸篓。
 - **永久删除**: 真正的永久删除需要同时使用 `--permanent` 和 `--confirm-permanent` 标志，以防止意外灾难。
 
+## 🗑️ 卸载 FoxClean
+
+如果您需要从系统中移除 FoxClean，您有两种选择：
+
+**1. 标准 macOS 方式:**
+- 打开 `Finder` 并进入 `Applications` (应用程序) 文件夹。
+- 将 `FoxClean.app` 拖到废纸篓 (或右键单击并选择 "移至废纸篓")。
+- 清空废纸篓。
+
+**2. 通过 CLI 完全移除:**
+要完全移除 FoxClean 及其所有关联数据 (缓存、首选项、日志等)，您可以在删除该应用程序之前使用它自己的 CLI：
+```sh
+fox uninstall dev.foxclean.app --confirm
+```
+
 ## 🏗️ 构建说明
 
 从源码构建 FoxClean 应用程序和 CLI：
