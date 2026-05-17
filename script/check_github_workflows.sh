@@ -25,6 +25,7 @@ done
 rg -q 'xcodegen generate' .github/workflows/build.yml
 rg -q 'xcodebuild -scheme FoxCleanApp' .github/workflows/build.yml
 rg -q 'swift test' .github/workflows/test.yml
+rg -q 'brew bundle' .github/workflows/lint.yml
 rg -q './script/check_telemetry_free.sh' .github/workflows/lint.yml
 rg -q './script/check_localization.sh' .github/workflows/lint.yml
 rg -q './script/check_accessibility_static.sh' .github/workflows/lint.yml

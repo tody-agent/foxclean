@@ -9,6 +9,7 @@ jobs:
     runs-on: macos-15
     steps:
       - uses: actions/checkout@v4
+      - run: brew bundle
       - run: ./script/check_telemetry_free.sh
       - run: ./script/check_localization.sh
       - run: ./script/check_accessibility_static.sh
