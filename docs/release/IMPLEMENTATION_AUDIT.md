@@ -126,7 +126,7 @@ GitHub CI and Pages:
 | Launch content scaffold | `docs/release/LAUNCH_POSTS.md` contains draft HN, Product Hunt, and X/Twitter launch copy; `script/check_release_docs.sh` verifies release notes, QA, audit, traceability, checksum references, preflight command, and launch drafts. |
 | Homebrew validation | `script/check_homebrew_formula.sh` verifies cask syntax, version, release URL, app stanza, embedded CLI binary stanza, and zap cleanup paths. |
 | Homebrew SHA update | `script/update_homebrew_cask_sha.sh` rewrites `homebrew/foxclean.rb` from `dist/FoxClean-1.0.0.dmg.sha256`; `script/package_release.sh` runs it after each DMG build. |
-| Localization validation | `script/check_localization.sh` verifies 7 locale folders, `Resources/Localizable.xcstrings`, and key parity against English strings. |
+| Localization validation | `script/check_localization.sh` verifies 7 locale folders, `Resources/Localizable.xcstrings`, and key parity against English strings; `script/check_swiftui_localization_keys.sh` verifies SwiftUI literal coverage for common user-visible controls, dialogs, and accessibility labels. |
 | Accessibility validation | `script/check_accessibility_static.sh` verifies required labels/descriptions for key navigational and visual surfaces. |
 | App runtime validation | `script/check_app_runtime_static.sh` guards the menu bar and sidebar implementation that fixed the startup hang/click regression. |
 | Local release packaging | `script/package_release.sh` builds Release, verifies embedded `fox`, stages a drag-install Applications symlink, creates `dist/FoxClean-1.0.0.dmg` plus `dist/FoxClean-1.0.0.dmg.sha256`, updates the Homebrew cask SHA, and supports optional Developer ID signing/notarization through Apple notary API key or Apple ID password env vars. |
@@ -166,7 +166,8 @@ require credentials, account ownership, network publishing, or manual OS consent
   sensor APIs.
 - UI snapshot and full VoiceOver/tab-order/contrast automation are not yet part
   of the local gate.
-- Full runtime UI string extraction is still broader than the static
-  localization key-parity gate.
+- Localization coverage is static and keyed to common SwiftUI literal
+  constructors; runtime-only strings assembled through interpolation still rely
+  on the existing English fallback behavior.
 - `swiftlint` and `swift-format` are configured for CI/developer machines but
   are not bundled in this workspace.

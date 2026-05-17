@@ -42,7 +42,7 @@ Status legend:
 | Local run action | `.codex/environments/environment.toml` points `Run` to `./script/build_and_run.sh` and `Verify` to `./script/verify_local.sh --launch`. | Pass |
 | GUI URL scheme | `FoxCleanApp/Info.plist` registers `foxclean://`; `AppState.route(to:)` maps links to sections; `fox open monitor --print-url` is verified. | Pass |
 | Touch ID sudo | `fox touchid status --json` reports real PAM state; `enable/disable --dry-run --json` are smoke checked; real `enable/disable` edits `/etc/pam.d/sudo_local` directly when root/writable or via `sudo`, with `.foxclean.bak` backup. Real authorization still requires user admin consent. | Partial |
-| Localization | `FoxCleanApp/{en,vi,es,ja,zh-Hans,zh-Hant,ar}.lproj/Localizable.strings`, `Resources/Localizable.xcstrings`, and README files exist. `script/check_localization.sh` verifies all 7 locale files exist and have key parity with English. Full runtime UI string extraction remains broader than this static gate. | Partial |
+| Localization | `FoxCleanApp/{en,vi,es,ja,zh-Hans,zh-Hant,ar}.lproj/Localizable.strings`, `Resources/Localizable.xcstrings`, and README files exist. `script/check_localization.sh` verifies all 7 locale files exist and have key parity with English; `script/check_swiftui_localization_keys.sh` verifies common SwiftUI user-visible literals have base localization keys. Missing non-primary translations fall back to English. | Pass |
 | Accessibility | Sidebar, FDA footer, treemap, menu bar chart, menu bar buttons, and status item have static labels/descriptions. Foxie and dashboard gauges honor macOS Reduce Motion, with an app-level "Reduce Foxie animations" toggle. `script/check_accessibility_static.sh` verifies required labels and reduce-motion hooks. Full VoiceOver/tab-order/contrast audit remains manual. | Partial |
 | Telemetry-free | No telemetry SDK or endpoint is included; release QA tracks this. | Pass |
 | Signed/notarized DMG | `script/package_release.sh` supports Developer ID signing plus notarization through Apple notary API key env vars or Apple ID app-specific password env vars. Actual notarization still requires credentials and network submission. | Blocked |
@@ -72,6 +72,7 @@ Verified:
 - `./script/update_homebrew_cask_sha.sh`
 - `./script/check_release_docs.sh`
 - `./script/check_localization.sh`
+- `./script/check_swiftui_localization_keys.sh`
 - `./script/check_accessibility_static.sh`
 - `./script/check_app_runtime_static.sh`
 - `xcodegen generate`

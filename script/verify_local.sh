@@ -135,6 +135,7 @@ run_log "release-docs" ./script/check_release_docs.sh
 
 step "Localization and accessibility static checks"
 run_log "localization" ./script/check_localization.sh
+run_log "swiftui-localization-keys" ./script/check_swiftui_localization_keys.sh
 run_log "accessibility-static" ./script/check_accessibility_static.sh
 run_log "app-runtime-static" ./script/check_app_runtime_static.sh
 
