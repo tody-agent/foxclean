@@ -488,6 +488,9 @@ private struct StorageGauge: View {
                     .foregroundStyle(.secondary)
             }
         }
+        .accessibilityElement(children: .ignore)
+        .accessibilityLabel("Storage used")
+        .accessibilityValue("\(displayPercent)%")
     }
 }
 
@@ -518,6 +521,7 @@ private struct ScanningGauge: View {
     @State private var rotate = false
 
     var body: some View {
+        let progressPercent = Int(progress * 100)
         ZStack {
             Circle()
                 .stroke(Color.primary.opacity(0.10), lineWidth: 14)
@@ -530,15 +534,18 @@ private struct ScanningGauge: View {
                 .rotationEffect(.degrees(reduceMotion ? 0 : (rotate ? 360 : 0)))
                 .animation(reduceMotion ? nil : .linear(duration: 4).repeatForever(autoreverses: false), value: rotate)
             VStack(spacing: 2) {
-                Text("\(Int(progress * 100))%")
+                Text("\(progressPercent)%")
                     .font(.system(size: 36, weight: .bold))
                     .monospacedDigit()
                 Text("SCANNING")
                     .font(.system(size: 10, weight: .semibold))
                     .tracking(0.6)
-                    .foregroundStyle(.secondary)
+                .foregroundStyle(.secondary)
             }
         }
+        .accessibilityElement(children: .ignore)
+        .accessibilityLabel("Scan progress")
+        .accessibilityValue("\(progressPercent)%")
         .onAppear { rotate = !reduceMotion }
         .onChange(of: reduceMotion) { reduced in
             rotate = !reduced

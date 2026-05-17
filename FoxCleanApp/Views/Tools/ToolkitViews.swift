@@ -572,6 +572,9 @@ struct OptimizeView: View {
                         Image(systemName: reportIcon(report))
                             .foregroundStyle(reportColor(report))
                     }
+                    .accessibilityElement(children: .combine)
+                    .accessibilityLabel("Optimization result")
+                    .accessibilityValue("\(report.task): \(report.message)")
                 }
             }
         }

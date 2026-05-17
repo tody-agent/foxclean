@@ -229,6 +229,9 @@
 
 /* Optimize UI */
 "Preview" = "Preview";
+"Optimization result" = "Optimization result";
 "Run All" = "Run All";
 "Running optimization tasks…" = "Running optimization tasks…";
+"Scan progress" = "Scan progress";
+"Storage used" = "Storage used";
 "Use optimize_whitelist" = "Use optimize_whitelist";
