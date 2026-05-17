@@ -128,7 +128,7 @@ final class AppState: ObservableObject {
         }
     }
 
-    func scanForAppFiles(_ app: InstalledApp) {
+    func scanForAppFiles(_ app: InstalledApp, sensitivity: AppPathFinder.Sensitivity = .enhanced) {
         discoveredFiles = []
         selectedFiles = []
         isScanningAppFiles = true
@@ -140,7 +140,7 @@ final class AppState: ObservableObject {
             entitlements: nil,
             teamIdentifier: nil
         )
-        let finder = AppPathFinder(appInfo: appInfo, locations: locations)
+        let finder = AppPathFinder(appInfo: appInfo, locations: locations, sensitivity: sensitivity)
         finder.findPathsAsync { [weak self] urls in
             guard let self else { return }
             let sorted = urls.sorted { $0.path < $1.path }

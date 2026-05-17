@@ -4,6 +4,9 @@ struct AppListView: View {
     @EnvironmentObject var appState: AppState
     @State private var searchText = ""
     @State private var selection: InstalledApp.ID?
+    @State private var hideSystemApps = true
+    @State private var hideProtectedApps = true
+    @State private var sensitivity = 1.0
     @State private var sortOrder: [KeyPathComparator<InstalledApp>] = [
         .init(\.appName, order: .forward)
     ]
@@ -16,10 +19,14 @@ struct AppListView: View {
             let query = searchText.lowercased()
             base = appState.installedApps.filter {
                 $0.appName.lowercased().contains(query) ||
-                $0.bundleIdentifier.lowercased().contains(query)
+                $0.bundleIdentifier.lowercased().contains(query) ||
+                $0.path.path.lowercased().contains(query)
             }
         }
-        return base.sorted(using: sortOrder)
+        return base
+            .filter { !hideSystemApps || !$0.isSystemApp }
+            .filter { !hideProtectedApps || !$0.isProtected }
+            .sorted(using: sortOrder)
     }
 
     var body: some View {
@@ -41,6 +48,8 @@ struct AppListView: View {
                 } label: {
                     Label("Refresh", systemImage: "arrow.clockwise")
                 }
+                Toggle("Hide system apps", isOn: $hideSystemApps)
+                Toggle("Hide protected apps", isOn: $hideProtectedApps)
 
                 if !appState.selectedFiles.isEmpty {
                     Button("Uninstall (\(appState.selectedFiles.count) files)", role: .destructive) {
@@ -93,7 +102,7 @@ struct AppListView: View {
                     if let id = newValue,
                        let app = appState.installedApps.first(where: { $0.id == id }) {
                         appState.selectedApp = app
-                        appState.scanForAppFiles(app)
+                        appState.scanForAppFiles(app, sensitivity: appSensitivity)
                     }
                 }
             }
@@ -105,13 +114,69 @@ struct AppListView: View {
     @ViewBuilder
     private var fileDetail: some View {
         if let app = appState.selectedApp {
-            AppFilesView(app: app)
+            VStack(spacing: 0) {
+                sensitivityControl
+                Divider()
+                AppFilesView(app: app)
+            }
         } else {
             EmptyStateView(
                 "Select an App",
                 systemImage: "cursorarrow.click.2",
                 description: "Select an app from the list to see all its related files across your system."
             )
+        }
+    }
+
+    private var sensitivityControl: some View {
+        VStack(alignment: .leading, spacing: 6) {
+            HStack {
+                Text("Sensitivity")
+                    .font(.caption.bold())
+                Spacer()
+                Text(sensitivityLabel)
+                    .font(.caption)
+                    .foregroundStyle(sensitivityColor)
+            }
+            Slider(value: $sensitivity, in: 0...2, step: 1) {
+                Text("Sensitivity")
+            } minimumValueLabel: {
+                Text("Strict").font(.caption2)
+            } maximumValueLabel: {
+                Text("Deep").font(.caption2)
+            }
+            .tint(sensitivityColor)
+            .onChange(of: sensitivity) { _ in
+                if let app = appState.selectedApp {
+                    appState.scanForAppFiles(app, sensitivity: appSensitivity)
+                }
+            }
+        }
+        .padding(.horizontal)
+        .padding(.vertical, 10)
+    }
+
+    private var appSensitivity: AppPathFinder.Sensitivity {
+        switch Int(sensitivity.rounded()) {
+        case 0: return .strict
+        case 2: return .deep
+        default: return .enhanced
+        }
+    }
+
+    private var sensitivityLabel: String {
+        switch appSensitivity {
+        case .strict: return "Strict"
+        case .enhanced: return "Enhanced"
+        case .deep: return "Deep"
+        }
+    }
+
+    private var sensitivityColor: Color {
+        switch appSensitivity {
+        case .strict: return Tint.green
+        case .enhanced: return Tint.orange
+        case .deep: return Tint.red
         }
     }
 }

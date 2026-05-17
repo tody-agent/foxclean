@@ -8,6 +8,9 @@ struct InstalledApp: Identifiable, Hashable {
     let path: URL
     let icon: NSImage
     let size: Int64
+    let installDate: Date?
+    let isSystemApp: Bool
+    let isProtected: Bool
 
     var formattedSize: String {
         ByteCountFormatter.string(fromByteCount: size, countStyle: .file)
@@ -91,6 +94,9 @@ final class AppInfoFetcher {
         icon.size = NSSize(width: 32, height: 32)
 
         let size = appSize(at: url)
+        let values = try? url.resourceValues(forKeys: [.contentModificationDateKey, .creationDateKey])
+        let isSystemApp = url.path.hasPrefix("/System")
+        let isProtected = isSystemApp || Self.protectedBundleIDs.contains(bundleID)
 
         return InstalledApp(
             id: UUID(),
@@ -98,7 +104,10 @@ final class AppInfoFetcher {
             bundleIdentifier: bundleID,
             path: url,
             icon: icon,
-            size: size
+            size: size,
+            installDate: values?.creationDate ?? values?.contentModificationDate,
+            isSystemApp: isSystemApp,
+            isProtected: isProtected
         )
     }
 

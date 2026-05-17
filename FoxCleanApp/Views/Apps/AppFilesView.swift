@@ -3,6 +3,7 @@ import SwiftUI
 struct AppFilesView: View {
     @EnvironmentObject var appState: AppState
     let app: InstalledApp
+    @State private var showBulkConfirmation = false
 
     private var totalSelectedSize: Int64 {
         appState.selectedFiles.reduce(Int64(0)) { total, url in
@@ -21,9 +22,14 @@ struct AppFilesView: View {
                 VStack(alignment: .leading, spacing: 2) {
                     Text(app.appName)
                         .font(.title3.bold())
-                    Text(app.bundleIdentifier)
-                        .font(.caption)
-                        .foregroundStyle(.secondary)
+                        Text(app.bundleIdentifier)
+                            .font(.caption)
+                            .foregroundStyle(.secondary)
+                        if let installDate = app.installDate {
+                            Text("Installed \(installDate.formatted(date: .abbreviated, time: .omitted))")
+                                .font(.caption2)
+                                .foregroundStyle(.tertiary)
+                        }
                 }
 
                 Spacer()
@@ -81,8 +87,8 @@ struct AppFilesView: View {
                     Spacer()
 
                     if !appState.selectedFiles.isEmpty {
-                        Button("Remove \(appState.selectedFiles.count) files (\(ByteCountFormatter.string(fromByteCount: totalSelectedSize, countStyle: .file)))", role: .destructive) {
-                            appState.removeSelectedFiles()
+                        Button("Uninstall Completely (\(appState.selectedFiles.count) files, \(ByteCountFormatter.string(fromByteCount: totalSelectedSize, countStyle: .file)))", role: .destructive) {
+                            showBulkConfirmation = true
                         }
                         .buttonStyle(.borderedProminent)
                         .tint(.red)
@@ -104,6 +110,18 @@ struct AppFilesView: View {
             }
         } message: {
             Text(appState.removalError ?? "")
+        }
+        .confirmationDialog(
+            "Uninstall \(app.appName)?",
+            isPresented: $showBulkConfirmation,
+            titleVisibility: .visible
+        ) {
+            Button("Move to Trash", role: .destructive) {
+                appState.removeSelectedFiles()
+            }
+            Button("Cancel", role: .cancel) {}
+        } message: {
+            Text("FoxClean will move selected app files to Trash. Review the file list before continuing.")
         }
     }
 

@@ -5,6 +5,16 @@ struct OrphanListView: View {
     @State private var selectedOrphans: Set<URL> = []
     @State private var isRemoving = false
     @State private var removalErrorMessage: String?
+    @State private var searchText = ""
+    @State private var showRemoveConfirmation = false
+
+    private var filteredOrphans: [URL] {
+        guard !searchText.isEmpty else { return appState.orphanedFiles }
+        return appState.orphanedFiles.filter {
+            $0.lastPathComponent.localizedCaseInsensitiveContains(searchText) ||
+            $0.path.localizedCaseInsensitiveContains(searchText)
+        }
+    }
 
     var body: some View {
         Group {
@@ -18,7 +28,7 @@ struct OrphanListView: View {
             } else if appState.orphanedFiles.isEmpty {
                 EmptyStateView("No Orphaned Files", systemImage: "checkmark.circle", description: "No leftover files from uninstalled apps were found.", action: { appState.findOrphans() }, actionLabel: "Scan for Orphans")
             } else {
-                List(appState.orphanedFiles, id: \.self) { fileURL in
+                List(filteredOrphans, id: \.self) { fileURL in
                     Toggle(isOn: orphanBinding(for: fileURL)) {
                         HStack {
                             Image(nsImage: NSWorkspace.shared.icon(forFile: fileURL.path))
@@ -53,16 +63,20 @@ struct OrphanListView: View {
                 }
             }
         }
+        .searchable(text: $searchText, prompt: "Filter orphan files")
         .navigationTitle("Orphaned Files (\(appState.orphanedFiles.count))")
         .toolbar {
             ToolbarItemGroup {
-                if !appState.orphanedFiles.isEmpty {
-                    Button(selectedOrphans.count == appState.orphanedFiles.count ? "Deselect All" : "Select All") {
-                        if selectedOrphans.count == appState.orphanedFiles.count {
+                if !filteredOrphans.isEmpty {
+                    Button(selectedOrphans.count == filteredOrphans.count ? "Deselect All" : "Select All") {
+                        if selectedOrphans.count == filteredOrphans.count {
                             selectedOrphans.removeAll()
                         } else {
-                            selectedOrphans = Set(appState.orphanedFiles)
+                            selectedOrphans = Set(filteredOrphans)
                         }
+                    }
+                    Button("Smart Select") {
+                        selectedOrphans = Set(filteredOrphans.filter(isSmartCandidate))
                     }
                 }
 
@@ -72,9 +86,7 @@ struct OrphanListView: View {
 
                 if !selectedOrphans.isEmpty {
                     Button("Remove Selected (\(selectedOrphans.count))", role: .destructive) {
-                        Task {
-                            await removeSelectedOrphans()
-                        }
+                        showRemoveConfirmation = true
                     }
                     .buttonStyle(.borderedProminent)
                     .tint(.red)
@@ -89,6 +101,20 @@ struct OrphanListView: View {
             Button("OK", role: .cancel) {}
         } message: {
             Text(removalErrorMessage ?? "")
+        }
+        .confirmationDialog(
+            "Remove selected orphan files?",
+            isPresented: $showRemoveConfirmation,
+            titleVisibility: .visible
+        ) {
+            Button("Move to Trash", role: .destructive) {
+                Task {
+                    await removeSelectedOrphans()
+                }
+            }
+            Button("Cancel", role: .cancel) {}
+        } message: {
+            Text("FoxClean will remove orphaned files that pass the safety policy.")
         }
     }
 
@@ -117,6 +143,15 @@ struct OrphanListView: View {
         guard let attrs = try? FileManager.default.attributesOfItem(atPath: url.path),
               let size = attrs[.size] as? Int64 else { return nil }
         return size
+    }
+
+    private func isSmartCandidate(_ url: URL) -> Bool {
+        guard OrphanSafetyPolicy.isSafeCandidate(url) else { return false }
+        let size = fileSize(url) ?? 0
+        let values = try? url.resourceValues(forKeys: [.contentModificationDateKey])
+        let oldCutoff = Calendar.current.date(byAdding: .day, value: -30, to: Date()) ?? Date()
+        let isOld = (values?.contentModificationDate ?? .distantFuture) < oldCutoff
+        return size > 100_000_000 || isOld
     }
 
     private func removeSelectedOrphans() async {
