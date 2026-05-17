@@ -35,8 +35,8 @@ Status legend:
 | System monitor | `SystemMonitor`, `MonitorView`, menu bar metrics, and `fox status` now use host CPU ticks, VM memory stats, network counters, disk I/O throughput via IOKit storage statistics, process count, top processes via libproc, battery percent via IOKit Power Sources, disk free, public macOS thermal state, and health score. | Pass |
 | Menu bar widget | `MenuBarController` uses AppKit `NSStatusItem` with a SwiftUI `NSPopover`, mini CPU chart, health/memory metrics, Smart Scan/Open/Monitor/Quit actions, and a Settings toggle. `app-responsive` passes after launch. | Pass |
 | App responsiveness | `script/check_app_responsive.sh` verifies the launched app stays below the CPU threshold after startup; `script/check_app_runtime_static.sh` guards against reintroducing SwiftUI `MenuBarExtra` and missing local sidebar selection state. | Pass |
-| Project purge | Toolkit project marker scanning in core/GUI/CLI; unit tests cover marker safety and `~/.config/foxclean/purge_paths` custom roots; CLI JSON smoke covers `fox purge --paths Sources`. | Pass |
-| Installer cleanup | `InstallerScanner` scans Downloads/Desktop/Documents/Shared, Homebrew caches, Mail Downloads, iCloud Downloads, and common archive/installer extensions; `ScannedFile.source` labels origin in CLI JSON and GUI. | Pass |
+| Project purge | Toolkit project marker scanning in core/GUI/CLI; `ProjectPurgeView` groups artifacts by project, marks Recent artifacts, leaves Recent artifacts unchecked by default, and confirms before moving selected artifacts to Trash. Unit tests cover marker safety and `~/.config/foxclean/purge_paths` custom roots; CLI JSON smoke covers `fox purge --paths Sources`; `script/check_toolkit_ui_static.sh` guards the GUI behavior. | Pass |
+| Installer cleanup | `InstallerScanner` scans Downloads/Desktop/Documents/Shared, Homebrew caches, Mail Downloads, iCloud Downloads, and common archive/installer extensions; `ScannedFile.source` labels origin in CLI JSON and GUI. `InstallerCleanupView` supports source filters, size/age sorting, auto-selects installers older than 30 days, and confirms before moving selected installers to Trash. `script/check_toolkit_ui_static.sh` guards the GUI behavior. | Pass |
 | Optimize tasks | `Optimizer` exposes six independent task descriptors with ids, descriptions, admin flags, command previews, selected-task filtering, dry-run JSON, `~/.config/foxclean/optimize_whitelist`, skipped-task reports, safe non-admin execution paths, and native macOS admin prompt plumbing for whitelisted admin commands. `OptimizeView` has toggles plus Preview, Run Selected, Run All, progress, and result rows. `script/check_optimize_static.sh`, unit tests, and CLI JSON smokes cover the local behavior; real admin execution still requires explicit user authorization. | Pass |
 | Shell completion/Raycast | `fox completion zsh`, `bash`, and `fish` are smoke checked; `scripts/raycast/*.sh` and setup script exist. | Pass |
 | Local run action | `.codex/environments/environment.toml` points `Run` to `./script/build_and_run.sh` and `Verify` to `./script/verify_local.sh --launch`. | Pass |
@@ -78,6 +78,7 @@ Verified:
 - `./script/check_app_runtime_static.sh`
 - `./script/check_gui_static.sh`
 - `./script/check_optimize_static.sh`
+- `./script/check_toolkit_ui_static.sh`
 - `xcodegen generate`
 - `xcodebuild -scheme FoxCleanCore -destination 'platform=macOS' build`
 - `xcodebuild -scheme FoxCleanCLI -destination 'platform=macOS' build`

@@ -1,6 +1,6 @@
 cask "foxclean" do
   version "1.0.0"
-  sha256 "1db83fd392396b04ae9b4586f101b7505954792ad0900b2e4e87257a6c625330"
+  sha256 "58894cf9a7658a8e9bfe14e6ceef330f3726a89eb7cc6d8bfab9d04558e192dc"
 
   url "https://github.com/tody-agent/foxclean/releases/download/v#{version}/FoxClean-#{version}.dmg"
   name "FoxClean"

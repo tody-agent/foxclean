@@ -141,6 +141,7 @@ run_log "app-runtime-static" ./script/check_app_runtime_static.sh
 run_log "gui-static" ./script/check_gui_static.sh
 run_log "clean-ui-static" ./script/check_clean_ui_static.sh
 run_log "optimize-static" ./script/check_optimize_static.sh
+run_log "toolkit-ui-static" ./script/check_toolkit_ui_static.sh
 
 step "Xcode builds"
 run_log "xcodebuild-core" xcodebuild -scheme FoxCleanCore -destination "platform=macOS" build

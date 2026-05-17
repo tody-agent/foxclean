@@ -430,69 +430,237 @@ private let monitorService = SystemMonitor()
 
 struct InstallerCleanupView: View {
     @State private var entries: [ToolFileEntry] = []
+    @State private var selectedIDs: Set<String> = []
+    @State private var selectedSource = "All"
+    @State private var sortMode: InstallerSort = .size
+    @State private var showConfirmation = false
+    @State private var resultMessage: String?
 
     var body: some View {
         ToolPage(title: "Installer Cleanup", subtitle: "Find downloaded installers from common locations.") {
-            Button {
-                scan()
-            } label: {
-                Label("Refresh", systemImage: "arrow.clockwise")
+            HStack {
+                Button {
+                    scan()
+                } label: {
+                    Label("Refresh", systemImage: "arrow.clockwise")
+                }
+                Picker("Sort", selection: $sortMode) {
+                    ForEach(InstallerSort.allCases) { sort in
+                        Text(sort.rawValue).tag(sort)
+                    }
+                }
+                .pickerStyle(.segmented)
+                Spacer()
+                Button("Remove Selected") {
+                    showConfirmation = true
+                }
+                .disabled(selectedEntries.isEmpty)
             }
-            Table(entries) {
+
+            HStack {
+                ForEach(sourceFilters, id: \.self) { source in
+                    Button(source) {
+                        selectedSource = source
+                    }
+                    .buttonStyle(.bordered)
+                    .controlSize(.small)
+                    .tint(selectedSource == source ? .accentColor : .secondary)
+                }
+            }
+
+            Table(displayedEntries, selection: $selectedIDs) {
                 TableColumn("Installer") { entry in Label(entry.name, systemImage: "shippingbox.fill") }
                 TableColumn("Source") { entry in Text(entry.source ?? "Other") }
+                TableColumn("Age") { entry in Text(entry.ageDescription) }
                 TableColumn("Size") { entry in Text(ByteCountFormatter.string(fromByteCount: entry.size, countStyle: .file)) }
                 TableColumn("Path") { entry in Text(entry.url.path).foregroundStyle(.secondary) }
             }
             .frame(minHeight: 420)
+
+            if let resultMessage {
+                Label(resultMessage, systemImage: "checkmark.circle.fill")
+                    .foregroundStyle(Tint.green)
+            }
         }
         .onAppear { scan() }
+        .confirmationDialog(
+            "Remove selected installers?",
+            isPresented: $showConfirmation,
+            titleVisibility: .visible
+        ) {
+            Button("Move to Trash", role: .destructive) {
+                removeSelected()
+            }
+            Button("Cancel", role: .cancel) {}
+        } message: {
+            Text("FoxClean will move selected installer files to Trash and write an OperationLog entry.")
+        }
     }
 
     private func scan() {
-        entries = InstallerScanner().scan().map { file in
-            ToolFileEntry(url: file.url, size: file.size, isDirectory: false, source: file.source)
+        let files = InstallerScanner().scan()
+        entries = files.map { file in
+            ToolFileEntry(
+                url: file.url,
+                size: file.size,
+                isDirectory: false,
+                source: file.source,
+                modifiedAt: file.lastModified,
+                suggested: file.suggested
+            )
+        }
+        selectedIDs = Set(entries.filter(\.suggested).map(\.id))
+    }
+
+    private var sourceFilters: [String] {
+        ["All"] + Array(Set(entries.map { $0.source ?? "Other" })).sorted()
+    }
+
+    private var displayedEntries: [ToolFileEntry] {
+        let filtered = selectedSource == "All"
+            ? entries
+            : entries.filter { ($0.source ?? "Other") == selectedSource }
+        switch sortMode {
+        case .size:
+            return filtered.sorted { $0.size > $1.size }
+        case .age:
+            return filtered.sorted { ($0.modifiedAt ?? .distantFuture) < ($1.modifiedAt ?? .distantFuture) }
+        }
+    }
+
+    private var selectedEntries: [ToolFileEntry] {
+        entries.filter { selectedIDs.contains($0.id) }
+    }
+
+    private func removeSelected() {
+        let files = selectedEntries.map {
+            ScannedFile(
+                url: $0.url,
+                size: $0.size,
+                category: .installers,
+                lastModified: $0.modifiedAt,
+                suggested: $0.suggested,
+                source: $0.source
+            )
+        }
+        Task {
+            let result = await FileOperator().clean(files, mode: .trash)
+            await MainActor.run {
+                resultMessage = "Moved \(result.affectedCount) installer item(s) to Trash."
+                scan()
+            }
         }
     }
 }
 
 struct ProjectPurgeView: View {
     @State private var entries: [ToolFileEntry] = []
+    @State private var selectedIDs: Set<String> = []
+    @State private var showConfirmation = false
+    @State private var resultMessage: String?
 
     var body: some View {
         ToolPage(title: "Project Purge", subtitle: "Detect build artifacts only inside folders with project markers.") {
-            Button {
-                scan()
-            } label: {
-                Label("Scan Projects", systemImage: "folder.badge.gearshape")
+            HStack {
+                Button {
+                    scan()
+                } label: {
+                    Label("Scan Projects", systemImage: "folder.badge.gearshape")
+                }
+                Spacer()
+                Button("Remove Selected") {
+                    showConfirmation = true
+                }
+                .disabled(selectedEntries.isEmpty)
             }
-            Table(entries) {
-                TableColumn("Artifact") { entry in Label(entry.name, systemImage: "folder.fill") }
-                TableColumn("Size") { entry in Text(ByteCountFormatter.string(fromByteCount: entry.size, countStyle: .file)) }
-                TableColumn("Path") { entry in Text(entry.url.path).foregroundStyle(.secondary) }
+
+            List(selection: $selectedIDs) {
+                ForEach(projectGroups, id: \.project) { group in
+                    Section(group.project) {
+                        ForEach(group.entries) { entry in
+                            HStack(spacing: 12) {
+                                Label(entry.name, systemImage: "folder.fill")
+                                    .frame(minWidth: 180, alignment: .leading)
+                                if entry.isRecent {
+                                    Text("Recent")
+                                        .font(.caption2.bold())
+                                        .padding(.horizontal, 6)
+                                        .padding(.vertical, 2)
+                                        .background(Tint.orange.opacity(0.18), in: Capsule())
+                                }
+                                Spacer()
+                                Text(ByteCountFormatter.string(fromByteCount: entry.size, countStyle: .file))
+                                    .monospacedDigit()
+                                Text(entry.url.path)
+                                    .foregroundStyle(.secondary)
+                                    .lineLimit(1)
+                                    .truncationMode(.middle)
+                                    .frame(maxWidth: 320, alignment: .trailing)
+                            }
+                            .tag(entry.id)
+                        }
+                    }
+                }
             }
             .frame(minHeight: 420)
+
+            if let resultMessage {
+                Label(resultMessage, systemImage: "checkmark.circle.fill")
+                    .foregroundStyle(Tint.green)
+            }
         }
         .onAppear { scan() }
+        .confirmationDialog(
+            "Remove selected project artifacts?",
+            isPresented: $showConfirmation,
+            titleVisibility: .visible
+        ) {
+            Button("Move to Trash", role: .destructive) {
+                removeSelected()
+            }
+            Button("Cancel", role: .cancel) {}
+        } message: {
+            Text("FoxClean will move selected build artifacts to Trash and write an OperationLog entry. Recent artifacts are left unchecked by default.")
+        }
     }
 
     private func scan() {
         let roots = ProjectScanner.configuredRoots()
-        let artifacts = ["node_modules", ".next", "dist", "build", ".turbo", ".gradle", "target", ".pytest_cache", "__pycache__", ".build"]
-        let markers = ["package.json", "pyproject.toml", "Cargo.toml", "Package.swift", "go.mod"]
-        entries = roots.flatMap { root -> [ToolFileEntry] in
-            guard let enumerator = FileManager.default.enumerator(at: root, includingPropertiesForKeys: [.isDirectoryKey], options: [.skipsHiddenFiles, .skipsPackageDescendants]) else { return [] }
-            var out: [ToolFileEntry] = []
-            var seen = 0
-            for case let url as URL in enumerator {
-                seen += 1
-                if seen > 20_000 { break }
-                guard artifacts.contains(url.lastPathComponent), hasMarker(near: url.deletingLastPathComponent(), markers: markers, stopAt: root) else { continue }
-                out.append(ToolFileEntry(url: url, size: quickDirectorySize(url), isDirectory: true))
-                enumerator.skipDescendants()
+        entries = ProjectScanner().scan(roots: roots).map { artifact in
+            ToolFileEntry(
+                url: artifact.url,
+                size: artifact.size,
+                isDirectory: true,
+                projectName: artifact.projectRoot.lastPathComponent,
+                modifiedAt: nil,
+                isRecent: artifact.isRecent,
+                suggested: !artifact.isRecent
+            )
+        }
+        selectedIDs = Set(entries.filter(\.suggested).map(\.id))
+    }
+
+    private var projectGroups: [(project: String, entries: [ToolFileEntry])] {
+        Dictionary(grouping: entries, by: { $0.projectName ?? "Other" })
+            .map { (project: $0.key, entries: $0.value.sorted { $0.size > $1.size }) }
+            .sorted { $0.project < $1.project }
+    }
+
+    private var selectedEntries: [ToolFileEntry] {
+        entries.filter { selectedIDs.contains($0.id) }
+    }
+
+    private func removeSelected() {
+        let files = selectedEntries.map {
+            ScannedFile(url: $0.url, size: $0.size, category: .developerCache, lastModified: $0.modifiedAt, suggested: $0.suggested, source: "Project Purge")
+        }
+        Task {
+            let result = await FileOperator().clean(files, mode: .trash)
+            await MainActor.run {
+                resultMessage = "Moved \(result.affectedCount) project artifact(s) to Trash."
+                scan()
             }
-            return out
-        }.sorted { $0.size > $1.size }
+        }
     }
 }
 
@@ -559,6 +727,8 @@ struct OptimizeView: View {
                 if isRunning {
                     ProgressView("Running optimization tasks…")
                 }
+
+                Link("Edit whitelist", destination: Optimizer.defaultWhitelistURL.deletingLastPathComponent())
 
                 ForEach(reports, id: \.id) { report in
                     Label {
@@ -636,32 +806,23 @@ private struct ToolFileEntry: Identifiable {
     let size: Int64
     let isDirectory: Bool
     var source: String?
+    var projectName: String?
+    var modifiedAt: Date?
+    var isRecent: Bool = false
+    var suggested: Bool = true
     var name: String { url.lastPathComponent }
+
+    var ageDescription: String {
+        guard let modifiedAt else { return "--" }
+        let days = Calendar.current.dateComponents([.day], from: modifiedAt, to: Date()).day ?? 0
+        if days <= 0 { return "Today" }
+        return "\(days)d"
+    }
 }
 
-private func quickDirectorySize(_ url: URL) -> Int64 {
-    guard let enumerator = FileManager.default.enumerator(at: url, includingPropertiesForKeys: [.fileSizeKey, .totalFileAllocatedSizeKey], options: [.skipsHiddenFiles]) else { return 0 }
-    var total: Int64 = 0
-    var seen = 0
-    for case let child as URL in enumerator {
-        seen += 1
-        if seen > 8_000 { break }
-        let values = try? child.resourceValues(forKeys: [.fileSizeKey, .totalFileAllocatedSizeKey])
-        total += Int64(values?.totalFileAllocatedSize ?? values?.fileSize ?? 0)
-    }
-    return total
-}
+private enum InstallerSort: String, CaseIterable, Identifiable {
+    case size = "Size"
+    case age = "Age"
 
-private func hasMarker(near start: URL, markers: [String], stopAt: URL) -> Bool {
-    var current = start
-    let stop = stopAt.resolvingSymlinksInPath().standardizedFileURL.path
-    while current.resolvingSymlinksInPath().standardizedFileURL.path.hasPrefix(stop) {
-        if markers.contains(where: { FileManager.default.fileExists(atPath: current.appendingPathComponent($0).path) }) {
-            return true
-        }
-        let parent = current.deletingLastPathComponent()
-        if parent.path == current.path { break }
-        current = parent
-    }
-    return false
+    var id: String { rawValue }
 }
