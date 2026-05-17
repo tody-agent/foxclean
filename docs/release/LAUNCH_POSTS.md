@@ -57,7 +57,7 @@ FoxClean v1.0 is ready: a free, MIT-licensed macOS cleaner with a native SwiftUI
 app, embedded `fox` CLI, dry-run-first cleanup, Trash-first deletes, operation
 logs, rollback hooks, disk analyzer, and no telemetry.
 
-Download: https://github.com/foxclean/foxclean/releases/latest
+Download: https://github.com/tody-agent/foxclean/releases/latest
 ```
 
 ## Maintainer Checklist

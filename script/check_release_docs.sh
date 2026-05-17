@@ -25,7 +25,7 @@ required_patterns=(
   'FoxClean-1.0.0.dmg.sha256'
   'Show HN: FoxClean'
   'Product Hunt'
-  'Download: https://github.com/foxclean/foxclean/releases/latest'
+  'Download: https://github.com/tody-agent/foxclean/releases/latest'
 )
 
 for pattern in "${required_patterns[@]}"; do

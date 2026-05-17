@@ -2,10 +2,10 @@ cask "foxclean" do
   version "1.0.0"
   sha256 "0080a4d9d66f17b58d52cf01edf4c036dd0ccce427b2db3f7fa259835ffaf49c"
 
-  url "https://github.com/foxclean/foxclean/releases/download/v#{version}/FoxClean-#{version}.dmg"
+  url "https://github.com/tody-agent/foxclean/releases/download/v#{version}/FoxClean-#{version}.dmg"
   name "FoxClean"
   desc "Free, telemetry-free macOS cleaner with native GUI and CLI"
-  homepage "https://github.com/foxclean/foxclean"
+  homepage "https://github.com/tody-agent/foxclean"
 
   app "FoxClean.app"
   binary "#{appdir}/FoxClean.app/Contents/Resources/fox"

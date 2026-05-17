@@ -4,7 +4,7 @@ set -euo pipefail
 ROOT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
 VERSION="${FOX_VERSION:-1.0.0}"
 APP_NAME="FoxClean"
-EXPECTED_GITHUB_REPO="${FOX_GITHUB_REPO:-foxclean/foxclean}"
+EXPECTED_GITHUB_REPO="${FOX_GITHUB_REPO:-tody-agent/foxclean}"
 DMG_PATH="$ROOT_DIR/dist/$APP_NAME-$VERSION.dmg"
 DMG_SHA_PATH="$DMG_PATH.sha256"
 STRICT=0

@@ -18,7 +18,7 @@ Status legend:
 | Read `sped.md` / project spec | Original source file present in workspace was `spec.md`; `sped.md` now exists as an alias note pointing to `spec.md`. `spec.md` was inspected and mapped here. | Pass |
 | Use two downloaded repos/folders | `PureMac/` and `Mole/` are present; app baseline under `FoxCleanApp/`, rule/hint resources and scripts derive from them. | Pass |
 | Create OpenSpec with 8 changes | `openspec/changes/*/{proposal.md,design.md,tasks.md,specs/.../spec.md}` now exists for all 8 changes. | Pass |
-| Local git repository | `git rev-parse --is-inside-work-tree` returns `true`; initial commit `cbc9f37` exists; `origin` points at `https://github.com/foxclean/foxclean.git`. Public GitHub repo existence/access still requires account ownership and is checked by preflight. | Pass |
+| Local git repository | `git rev-parse --is-inside-work-tree` returns `true`; commits exist; `origin` points at `https://github.com/tody-agent/foxclean.git`. Public GitHub repo existence/access is checked by preflight. | Pass |
 | Foundation targets | `Package.swift`, `project.yml`, `FoxCleanApp`, `Sources/FoxCleanCore`, `Sources/FoxCleanCLI`; Xcode builds pass. | Pass |
 | MIT license and credits | `LICENSE`, `NOTICE`, `README.md`, `README.vi.md`. | Pass |
 | Root ignore/tooling | `.gitignore`, `.swiftlint.yml`, `.swift-format`, `.editorconfig`, `Brewfile`. | Pass |
@@ -52,7 +52,7 @@ Status legend:
 | Universal binary | `script/package_release.sh` enforces arm64+x86_64 slices for `FoxClean`, embedded `fox`, and `FoxCleanCore.framework`; verifier records `lipo -archs`. | Pass |
 | Homebrew publication | Draft formula exists at `homebrew/foxclean.rb` with concrete SHA-256 generated from the local DMG; publication still requires tap/PR access. | Blocked |
 | Homebrew app CLI symlink target | `FoxClean.app/Contents/Resources/fox` is embedded with `FoxCleanCore.framework`; verifier executes embedded `fox --version`; `script/check_homebrew_formula.sh` verifies the cask URL, SHA-256, app stanza, binary stanza, zap paths, and Ruby syntax. | Pass |
-| GitHub release/site/social launch | Release workflow can create GitHub Release assets; `docs/site/index.html` and `.github/workflows/pages.yml` scaffold GitHub Pages; `docs/release/LAUNCH_POSTS.md` contains HN/Product Hunt/X drafts. Actual publishing and social launch require repository/account access. | Blocked |
+| GitHub release/site/social launch | Release workflow can create GitHub Release assets; `docs/site/index.html` and `.github/workflows/pages.yml` scaffold GitHub Pages; `docs/release/LAUNCH_POSTS.md` contains HN/Product Hunt/X drafts. Repository target changed to `tody-agent/foxclean` per user instruction. | Partial |
 | Local verification gate | `script/verify_local.sh --launch --package` passed on 2026-05-17. | Pass |
 
 ## Verification Performed

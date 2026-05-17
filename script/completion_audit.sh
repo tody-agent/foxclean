@@ -116,10 +116,10 @@ else
   fail "git repository has no commit"
 fi
 origin_url="$(git config --get remote.origin.url || true)"
-if [[ "$origin_url" == *"github.com/foxclean/foxclean"* ]]; then
+if [[ "$origin_url" == *"github.com/tody-agent/foxclean"* ]]; then
   pass "git remote origin points at FoxClean release repository"
 else
-  fail "git remote origin does not point at github.com/foxclean/foxclean"
+  fail "git remote origin does not point at github.com/tody-agent/foxclean"
 fi
 
 echo

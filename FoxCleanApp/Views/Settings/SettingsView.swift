@@ -177,8 +177,8 @@ struct AboutSettingsView: View {
             }
 
             Section {
-                Link("GitHub Repository", destination: URL(string: "https://github.com/foxclean/foxclean")!)
-                Link("Report an Issue", destination: URL(string: "https://github.com/foxclean/foxclean/issues")!)
+                Link("GitHub Repository", destination: URL(string: "https://github.com/tody-agent/foxclean")!)
+                Link("Report an Issue", destination: URL(string: "https://github.com/tody-agent/foxclean/issues")!)
             }
 
             Section {
