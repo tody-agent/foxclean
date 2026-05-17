@@ -30,7 +30,7 @@ Status legend:
 | CLI command surface | `Sources/FoxCleanCLI/main.swift`; smoke checked `--version`, non-TTY no-args usage, `status`, `scan apps --json`, `analyze Sources --json`, completions, `open --print-url`, and Touch ID dry-runs. | Pass |
 | GUI onboarding/dashboard/settings | SwiftUI views under `FoxCleanApp/Views`; app build and launch verification pass. Manual visual/snapshot checks are not automated. | Partial |
 | Keyboard shortcuts | `FoxCleanApp.swift` command menus provide navigation shortcuts, Smart Scan shortcut, Full Disk Access shortcut, and a Help -> Keyboard Shortcuts window. App build/launch verifier passes. | Pass |
-| Clean/uninstall/orphans UI | PureMac-derived app views and services exist; no current UI automation coverage. | Partial |
+| Clean/uninstall/orphans UI | PureMac-derived app views and services exist; `script/check_clean_ui_static.sh` verifies at least 9 cleanup categories, sidebar category rendering, select/deselect controls, destructive confirmations, protected app hiding, orphan safety policy, remove actions, and Finder reveal affordances. | Pass |
 | Disk analyzer | `DiskScanner`, mtime-based persistent SQLite scan cache in Application Support, squarified `TreemapLayout`, Analyzer Tree/Treemap modes, breadcrumb zoom, Finder reveal, guarded Move to Trash with `OperationLog`, and `fox analyze`; tests cover cache persistence behavior and treemap area/rows. | Pass |
 | System monitor | `SystemMonitor`, `MonitorView`, menu bar metrics, and `fox status` now use host CPU ticks, VM memory stats, network counters, disk I/O throughput via IOKit storage statistics, process count, top processes via libproc, battery percent via IOKit Power Sources, disk free, public macOS thermal state, and health score. | Pass |
 | Menu bar widget | `MenuBarController` uses AppKit `NSStatusItem` with a SwiftUI `NSPopover`, mini CPU chart, health/memory metrics, Smart Scan/Open/Monitor/Quit actions, and a Settings toggle. `app-responsive` passes after launch. | Pass |
@@ -74,6 +74,7 @@ Verified:
 - `./script/check_localization.sh`
 - `./script/check_swiftui_localization_keys.sh`
 - `./script/check_accessibility_static.sh`
+- `./script/check_clean_ui_static.sh`
 - `./script/check_app_runtime_static.sh`
 - `xcodegen generate`
 - `xcodebuild -scheme FoxCleanCore -destination 'platform=macOS' build`
