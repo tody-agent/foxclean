@@ -6,9 +6,14 @@ on:
 
 jobs:
   lint:
-    runs-on: macos-14
+    runs-on: macos-15
     steps:
       - uses: actions/checkout@v4
-      - run: brew bundle
-      - run: swiftlint lint --strict
-      - run: swift-format lint -r Sources FoxCleanApp Tests
+      - run: ./script/check_telemetry_free.sh
+      - run: ./script/check_localization.sh
+      - run: ./script/check_accessibility_static.sh
+      - run: ./script/check_app_runtime_static.sh
+      - run: ./script/check_homebrew_formula.sh
+      - run: ./script/check_release_docs.sh
+      - run: ./script/check_pages_site.sh
+      - run: ./script/check_github_workflows.sh

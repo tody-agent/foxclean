@@ -20,12 +20,14 @@ jobs:
     environment:
       name: github-pages
       url: ${{ steps.deployment.outputs.page_url }}
-    runs-on: macos-14
+    runs-on: macos-15
     steps:
       - uses: actions/checkout@v4
       - run: mkdir -p docs/site/assets
       - run: cp FoxCleanApp/Assets.xcassets/AppIcon.appiconset/icon_512.png docs/site/assets/icon_512.png
       - uses: actions/configure-pages@v5
+        with:
+          enablement: true
       - uses: actions/upload-pages-artifact@v3
         with:
           path: docs/site

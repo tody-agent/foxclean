@@ -30,6 +30,7 @@ done
 
 required_workflow_patterns=(
   'actions/configure-pages@v5'
+  'enablement: true'
   'actions/upload-pages-artifact@v3'
   'actions/deploy-pages@v4'
   'cp FoxCleanApp/Assets.xcassets/AppIcon.appiconset/icon_512.png docs/site/assets/icon_512.png'
